@@ -7,3 +7,7 @@ spring:
         url: ENC(h7PAHpEJNhEM/SrG/UW9pSBHQmQlevdHleG1/5sx7jNViNf8gDLe38oewiGDVu0c47A5sDh/tUQ=)
         username: ENC(Bhp3BJciwTKF6xvvwTp9Pw==)
         password: ENC(QXcsWGbSzkLYbV7+vnTnL1zwMsQh4/Gs)
+    jpa:
+        hibernate:
+            ddl-auto: update
+
