@@ -2,6 +2,8 @@ object Versions {
     const val JASYPT_VERSION = "3.0.5"
     const val P6SPY_VERSION = "1.9.2"
     const val KOTLIN_LOGGING_VERSION = "7.0.0"
+    const val MOCKK_VERSION = "1.13.12"
+    const val KOTEST_VERSION = "5.9.1"
 }
 
 plugins {
@@ -73,6 +75,9 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testImplementation("org.springframework.security:spring-security-test")
+    testImplementation("io.mockk:mockk:${Versions.MOCKK_VERSION}")
+    testImplementation("io.kotest:kotest-runner-junit5-jvm:${Versions.KOTEST_VERSION}")
+    testImplementation("io.kotest:kotest-assertions-core-jvm:${Versions.KOTEST_VERSION}")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
