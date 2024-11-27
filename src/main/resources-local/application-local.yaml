@@ -4,6 +4,10 @@ spring:
             on-profile: local
     datasource:
         driver-class-name: org.mariadb.jdbc.Driver
-        url: ENC(h7PAHpEJNhEM/SrG/UW9pSBHQmQlevdHleG1/5sx7jNViNf8gDLe38oewiGDVu0c47A5sDh/tUQ=)
+        url: ENC(m67CqpzFei+YdJ2EIi+Vwm4hzePF6r1T3SJ3OiGGWseDMPNmt/1xRu9wj7ega3WNFk+dW3xbDuc=)
         username: ENC(Bhp3BJciwTKF6xvvwTp9Pw==)
         password: ENC(QXcsWGbSzkLYbV7+vnTnL1zwMsQh4/Gs)
+    jpa:
+        hibernate:
+            ddl-auto: update
+
