@@ -2,6 +2,8 @@ object Versions {
     const val JASYPT_VERSION = "3.0.5"
     const val P6SPY_VERSION = "1.9.2"
     const val KOTLIN_LOGGING_VERSION = "7.0.0"
+    const val MOCKK_VERSION = "1.13.12"
+    const val KOTEST_VERSION = "5.9.1"
 }
 
 plugins {
@@ -10,6 +12,15 @@ plugins {
     id("org.springframework.boot") version "3.4.0"
     id("io.spring.dependency-management") version "1.1.6"
     kotlin("plugin.jpa") version "1.9.25"
+    kotlin("plugin.allopen") version "1.9.25"
+}
+
+apply(plugin = "kotlin-jpa")
+
+allOpen {
+    annotation("jakarta.persistence.Entity")
+    annotation("jakarta.persistence.MappedSuperclass")
+    annotation("jakarta.persistence.Embeddable")
 }
 
 group = "dulian"
@@ -45,6 +56,9 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
 
+    // Validation
+    implementation("org.springframework.boot:spring-boot-starter-validation")
+
     // Jasypt
     implementation("com.github.ulisesbocchio:jasypt-spring-boot-starter:${Versions.JASYPT_VERSION}")
 
@@ -64,6 +78,9 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testImplementation("org.springframework.security:spring-security-test")
+    testImplementation("io.mockk:mockk:${Versions.MOCKK_VERSION}")
+    testImplementation("io.kotest:kotest-runner-junit5-jvm:${Versions.KOTEST_VERSION}")
+    testImplementation("io.kotest:kotest-assertions-core-jvm:${Versions.KOTEST_VERSION}")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
