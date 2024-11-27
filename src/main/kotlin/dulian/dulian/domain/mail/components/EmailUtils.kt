@@ -3,12 +3,14 @@ package dulian.dulian.domain.mail.components
 import com.mailjet.client.ClientOptions
 import com.mailjet.client.MailjetClient
 import com.mailjet.client.MailjetRequest
+import com.mailjet.client.MailjetResponse
 import com.mailjet.client.resource.Emailv31
 import dulian.dulian.domain.mail.dto.EmailDto
 import dulian.dulian.domain.mail.entity.EmailLog
 import dulian.dulian.domain.mail.enums.EmailTemplateCode
+import dulian.dulian.domain.mail.exception.EmailErrorCode
 import dulian.dulian.domain.mail.repository.EmailLogRepository
-import dulian.dulian.global.config.db.enums.UseFlag
+import dulian.dulian.global.exception.CustomException
 import dulian.dulian.global.utils.ClientUtils
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.json.JSONArray
@@ -17,6 +19,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import org.thymeleaf.TemplateEngine
 import org.thymeleaf.context.Context
+import java.time.LocalDateTime
 
 @Component
 class EmailUtils(
@@ -37,6 +40,9 @@ class EmailUtils(
      * @param emailDto 메일 정보
      */
     fun sendEmail(emailDto: EmailDto) {
+        // 3분 내에 동일한 이메일로 3회 이상 요청이 들어온 경우 예외 처리
+        checkTooManyRequest(emailDto.recipient)
+
         val options = ClientOptions.builder()
             .apiKey(apiKey)
             .apiSecretKey(secretKey)
@@ -47,30 +53,17 @@ class EmailUtils(
 
         try {
             val response = client.post(request)
-            if (response.status != 200) {
-                log.error { "메일 전송 실패 - ${response.status}" }
-                emailLogRepository.save(
-                    EmailLog(
-                        email = emailDto.recipient,
-                        emailTemplateCode = emailDto.templateCode,
-                        successFlag = UseFlag.N,
-                        accessIp = ClientUtils.getClientIp()
-                    )
-                )
-            }
+            handleResponse(response, emailDto)
         } catch (e: Exception) {
             log.error(e) { "메일 전송 중 오류 발생" }
-            emailLogRepository.save(
-                EmailLog(
-                    email = emailDto.recipient,
-                    emailTemplateCode = emailDto.templateCode,
-                    successFlag = UseFlag.N,
-                    accessIp = ClientUtils.getClientIp()
-                )
-            )
+            emailLogRepository.save(EmailLog.ofFailLog(emailDto.recipient, emailDto.templateCode))
+            throw CustomException(EmailErrorCode.FAILED_SEND_EMAIL)
         }
     }
 
+    /**
+     * 메일 전송 요청 생성
+     */
     private fun createRequest(emailDto: EmailDto) = MailjetRequest(Emailv31.resource)
         .property(
             Emailv31.MESSAGES, JSONArray()
@@ -96,6 +89,9 @@ class EmailUtils(
                 )
         )
 
+    /**
+     * 메일 템플릿에 변수 적용
+     */
     private fun setContext(
         templateCode: EmailTemplateCode,
         variables: Map<String, Any>
@@ -105,4 +101,35 @@ class EmailUtils(
 
         return templateEngine.process("/mail/${templateCode.templateName}", context)
     }
+
+    /**
+     * 메일 전송 결과 처리
+     */
+    private fun handleResponse(
+        response: MailjetResponse,
+        emailDto: EmailDto
+    ) {
+        if (response.status == 200) {
+            emailLogRepository.save(EmailLog.ofSuccessLog(emailDto.recipient, emailDto.templateCode))
+        } else {
+            log.error { "메일 전송 실패 - ${response.status}" }
+            emailLogRepository.save(EmailLog.ofFailLog(emailDto.recipient, emailDto.templateCode))
+            throw CustomException(EmailErrorCode.FAILED_SEND_EMAIL)
+        }
+    }
+
+    /**
+     * 3분 내에 동일한 이메일로 3회 이상 요청이 들어온 경우 예외 처리
+     */
+    private fun checkTooManyRequest(recipient: String) {
+        val savedEmailLogs = emailLogRepository.findTop3ByEmailOrAccessIp(recipient, ClientUtils.getClientIp())
+        val recentEmailCount = savedEmailLogs.count {
+            it.createdAt.isAfter(LocalDateTime.now().minusMinutes(3))
+        }
+
+        if (recentEmailCount >= 3) {
+            throw CustomException(EmailErrorCode.TOO_MANY_REQUEST)
+        }
+    }
+
 }

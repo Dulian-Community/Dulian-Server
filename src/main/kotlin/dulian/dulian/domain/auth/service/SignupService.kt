@@ -7,15 +7,18 @@ import dulian.dulian.domain.auth.exception.SignupErrorCode
 import dulian.dulian.domain.auth.repository.MemberRepository
 import dulian.dulian.domain.mail.components.EmailUtils
 import dulian.dulian.domain.mail.dto.EmailDto
-import dulian.dulian.domain.mail.enums.EmailTemplateCode
+import dulian.dulian.domain.mail.entity.EmailCode
+import dulian.dulian.domain.mail.repository.EmailCodeRepository
 import dulian.dulian.global.exception.CustomException
 import jakarta.transaction.Transactional
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 
 @Service
 class SignupService(
     private val memberRepository: MemberRepository,
+    private val emailCodeRepository: EmailCodeRepository,
     private val passwordEncoder: PasswordEncoder,
     private val emailUtils: EmailUtils
 ) {
@@ -37,25 +40,17 @@ class SignupService(
     fun sendEmailConfirmCode(
         request: SignupConfirmDto.Request
     ) {
-        // 이메일 요청 제한 체크
-
-
         // 이메일 중복체크
         require(!memberRepository.existsByEmail(request.email)) {
             throw CustomException(SignupErrorCode.EXISTED_EMAIL)
         }
 
-        emailUtils.sendEmail(
-            EmailDto(
-                recipient = request.email,
-                templateCode = EmailTemplateCode.SIGNUP_CONFIRM,
-                variables = mapOf("code" to "123456")
-            )
-        )
+        // 이메일 전송
+        val emailDto = EmailDto.ofSignupConfirm(request.email)
+        emailUtils.sendEmail(emailDto)
 
-        // TODO : 이메일 로그 저장
-
-        // TODO : 인증번호 저장
+        // 인증 코드 저장
+        emailCodeRepository.save(EmailCode.ofSignupConfirm(emailDto.getCode(), request.email))
     }
 
     /**
@@ -77,6 +72,12 @@ class SignupService(
             throw CustomException(SignupErrorCode.PASSWORD_CONFIRM_FAIL)
         }
 
-        // TODO : 이메일 인증 확인
+        // 이메일 인증 확인
+        val savedEmailCode = emailCodeRepository.findByCodeAndEmail(request.emailConfirmCode, request.email)
+            ?: throw CustomException(SignupErrorCode.INVALID_EMAIL_CODE)
+
+        require(!savedEmailCode.createdAt.isBefore(LocalDateTime.now().minusMinutes(3))) {
+            throw CustomException(SignupErrorCode.INVALID_EMAIL_CODE)
+        }
     }
 }

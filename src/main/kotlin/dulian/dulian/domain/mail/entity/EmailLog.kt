@@ -2,6 +2,7 @@ package dulian.dulian.domain.mail.entity
 
 import dulian.dulian.domain.mail.enums.EmailTemplateCode
 import dulian.dulian.global.config.db.enums.UseFlag
+import dulian.dulian.global.utils.ClientUtils
 import jakarta.persistence.*
 import org.hibernate.annotations.ColumnDefault
 import org.hibernate.annotations.Comment
@@ -50,4 +51,33 @@ class EmailLog(
     @Comment("등록일자")
     val createdAt: LocalDateTime = LocalDateTime.now()
 ) {
+
+    companion object {
+
+        /**
+         * 이메일 전송 성공 로그 생성
+         */
+        fun ofFailLog(
+            email: String,
+            emailTemplateCode: EmailTemplateCode
+        ) = EmailLog(
+            successFlag = UseFlag.N,
+            emailTemplateCode = emailTemplateCode,
+            email = email,
+            accessIp = ClientUtils.getClientIp()
+        )
+
+        /**
+         * 이메일 전송 실패 로그 생성
+         */
+        fun ofSuccessLog(
+            email: String,
+            emailTemplateCode: EmailTemplateCode
+        ) = EmailLog(
+            successFlag = UseFlag.Y,
+            emailTemplateCode = emailTemplateCode,
+            email = email,
+            accessIp = ClientUtils.getClientIp()
+        )
+    }
 }
