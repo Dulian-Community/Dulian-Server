@@ -56,6 +56,9 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
 
+    // Validation
+    implementation("org.springframework.boot:spring-boot-starter-validation")
+
     // Jasypt
     implementation("com.github.ulisesbocchio:jasypt-spring-boot-starter:${Versions.JASYPT_VERSION}")
 

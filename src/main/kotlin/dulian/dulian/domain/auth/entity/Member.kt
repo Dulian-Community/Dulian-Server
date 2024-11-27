@@ -1,5 +1,6 @@
 package dulian.dulian.domain.auth.entity
 
+import dulian.dulian.domain.auth.dto.SignupDto
 import dulian.dulian.global.config.db.entity.BaseEntity
 import jakarta.persistence.*
 import org.hibernate.annotations.Comment
@@ -12,7 +13,7 @@ class Member(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "member_id", nullable = false, updatable = false)
     @Comment("회원 정보 IDX")
-    val memberId: Long,
+    val memberId: Long? = null,
 
     @Column(name = "user_id", length = 12, nullable = false, updatable = false, unique = true)
     @Comment("아이디")
@@ -30,4 +31,15 @@ class Member(
     @Comment("닉네임")
     val nickname: String
 ) : BaseEntity() {
+
+    companion object {
+
+        fun of(request: SignupDto.Request): Member =
+            Member(
+                userId = request.userId,
+                password = request.password,
+                email = request.email,
+                nickname = request.nickname
+            )
+    }
 }

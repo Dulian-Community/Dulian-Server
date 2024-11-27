@@ -9,7 +9,7 @@ class AuditorAwareImpl : AuditorAware<String> {
     override fun getCurrentAuditor(): Optional<String> {
         val authentication = SecurityContextHolder.getContext().authentication
 
-        if (authentication == null || !authentication.isAuthenticated) {
+        if (authentication == null || !authentication.isAuthenticated || authentication.name == "anonymousUser") {
             return Optional.of("SYSTEM")
         }
 

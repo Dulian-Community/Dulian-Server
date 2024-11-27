@@ -19,27 +19,32 @@ abstract class BaseEntity {
     @Column(name = "created_at", nullable = false, updatable = false, columnDefinition = "DATETIME")
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Comment("등록일자")
-    val createdAt: LocalDateTime = LocalDateTime.now()
+    lateinit var createdAt: LocalDateTime
+        protected set
 
     @CreatedBy
     @Column(name = "created_by", nullable = false, updatable = false, length = 50)
     @Comment("등록자")
-    val createdBy: String = "SYSTEM"
+    lateinit var createdBy: String
+        protected set
 
     @LastModifiedDate
     @Column(name = "updated_at", nullable = false, columnDefinition = "DATETIME")
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Comment("수정일자")
-    val updatedAt: LocalDateTime = LocalDateTime.now()
+    lateinit var updatedAt: LocalDateTime
+        protected set
 
     @LastModifiedBy
     @Column(name = "updated_by", nullable = false, length = 50)
     @Comment("수정자")
-    val updatedBy: String = "SYSTEM"
+    lateinit var updatedBy: String
+        protected set
 
     @Column(name = "use_flag", nullable = false, insertable = false, length = 1)
     @Enumerated(EnumType.STRING)
     @Comment("사용여부")
     @ColumnDefault("'Y'")
-    val useFlag: UseFlag = UseFlag.Y
+    lateinit var useFlag: UseFlag
+        protected set
 }
