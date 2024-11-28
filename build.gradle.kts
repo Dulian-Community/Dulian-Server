@@ -4,6 +4,7 @@ object Versions {
     const val KOTLIN_LOGGING_VERSION = "7.0.0"
     const val MOCKK_VERSION = "1.13.12"
     const val KOTEST_VERSION = "5.9.1"
+    const val MAILJET_VERSION = "5.2.5"
 }
 
 plugins {
@@ -70,6 +71,12 @@ dependencies {
 
     // Kotlin-Logging
     implementation("io.github.oshai:kotlin-logging-jvm:${Versions.KOTLIN_LOGGING_VERSION}")
+
+    // MailJet
+    implementation("com.mailjet:mailjet-client:${Versions.MAILJET_VERSION}")
+
+    // Thymeleaf
+    implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
 
     // MariaDB
     runtimeOnly("org.mariadb.jdbc:mariadb-java-client")
