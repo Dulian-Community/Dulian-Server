@@ -39,7 +39,9 @@ class EmailUtils(
      *
      * @param emailDto 메일 정보
      */
-    fun sendEmail(emailDto: EmailDto) {
+    fun sendEmail(
+        emailDto: EmailDto
+    ) {
         // 3분 내에 동일한 이메일로 3회 이상 요청이 들어온 경우 예외 처리
         checkTooManyRequest(emailDto.recipient)
 
@@ -64,7 +66,9 @@ class EmailUtils(
     /**
      * 메일 전송 요청 생성
      */
-    private fun createRequest(emailDto: EmailDto) = MailjetRequest(Emailv31.resource)
+    private fun createRequest(
+        emailDto: EmailDto
+    ) = MailjetRequest(Emailv31.resource)
         .property(
             Emailv31.MESSAGES, JSONArray()
                 .put(
@@ -121,7 +125,9 @@ class EmailUtils(
     /**
      * 3분 내에 동일한 이메일로 3회 이상 요청이 들어온 경우 예외 처리
      */
-    private fun checkTooManyRequest(recipient: String) {
+    private fun checkTooManyRequest(
+        recipient: String
+    ) {
         val savedEmailLogs = emailLogRepository.findTop3ByEmailOrAccessIp(recipient, ClientUtils.getClientIp())
         val recentEmailCount = savedEmailLogs.count {
             it.createdAt.isAfter(LocalDateTime.now().minusMinutes(3))
@@ -131,5 +137,4 @@ class EmailUtils(
             throw CustomException(EmailErrorCode.TOO_MANY_REQUEST)
         }
     }
-
 }

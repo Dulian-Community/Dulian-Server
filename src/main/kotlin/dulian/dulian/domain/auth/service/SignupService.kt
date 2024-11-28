@@ -8,6 +8,7 @@ import dulian.dulian.domain.auth.repository.MemberRepository
 import dulian.dulian.domain.mail.components.EmailUtils
 import dulian.dulian.domain.mail.dto.EmailDto
 import dulian.dulian.domain.mail.entity.EmailCode
+import dulian.dulian.domain.mail.enums.EmailTemplateCode
 import dulian.dulian.domain.mail.repository.EmailCodeRepository
 import dulian.dulian.global.exception.CustomException
 import jakarta.transaction.Transactional
@@ -56,7 +57,9 @@ class SignupService(
     /**
      * 회원가입 전 체크
      */
-    private fun checkBeforeSignup(request: SignupDto.Request) {
+    private fun checkBeforeSignup(
+        request: SignupDto.Request
+    ) {
         // 아이디 중복체크
         require(!memberRepository.existsByUserId(request.userId)) {
             throw CustomException(SignupErrorCode.EXISTED_USER_ID)
@@ -73,8 +76,11 @@ class SignupService(
         }
 
         // 이메일 인증 확인
-        val savedEmailCode = emailCodeRepository.findByCodeAndEmail(request.emailConfirmCode, request.email)
-            ?: throw CustomException(SignupErrorCode.INVALID_EMAIL_CODE)
+        val savedEmailCode = emailCodeRepository.findByCodeAndEmailAndEmailTemplateCode(
+            request.emailConfirmCode,
+            request.email,
+            EmailTemplateCode.SIGNUP_CONFIRM
+        ) ?: throw CustomException(SignupErrorCode.INVALID_EMAIL_CODE)
 
         require(!savedEmailCode.createdAt.isBefore(LocalDateTime.now().minusMinutes(3))) {
             throw CustomException(SignupErrorCode.INVALID_EMAIL_CODE)
