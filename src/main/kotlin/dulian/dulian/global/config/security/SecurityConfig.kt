@@ -56,6 +56,7 @@ class SecurityConfig {
     companion object {
         // 허용 URL
         private val PERMIT_ALL = arrayOf(
+            "/health-check",
             "/api/v1/auth/signup",
             "/api/v1/auth/signup/send-email-confirm-code"
         )

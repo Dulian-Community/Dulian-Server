@@ -2,3 +2,16 @@ spring:
     config:
         activate:
             on-profile: dev
+    datasource:
+        driver-class-name: org.mariadb.jdbc.Driver
+        url: ENC(isVMqUQsnSOwUQsIeu0oSSxa1OtErRz175lUmCR2PVzUZ0i3NCLmk7xLjb0JglPRtqJOTWu4aJjhm2rjmunawFz2zqHZVR/JGN3YkQu7Mmmv/SXeFPHc5V+r+mpcKrog)
+        username: ENC(Bhp3BJciwTKF6xvvwTp9Pw==)
+        password: ENC(QXcsWGbSzkLYbV7+vnTnL1zwMsQh4/Gs)
+    jpa:
+        hibernate:
+            ddl-auto: validate
+    mail:
+        username: noreply@dulian.kr
+        mailjet:
+            api-key: ENC(fkEgtAuS1J+DsnGdcUrJhS8rqHk1TsAe5cFuzHIwxya+2Smt6DI4FFztq2itbqnA)
+            secret-key: ENC(y5YUIwN26uLcv10HSn96jHszgUiQebXadQow1wKJc8vouo3g6asWZlLFJTSwZX5h)
