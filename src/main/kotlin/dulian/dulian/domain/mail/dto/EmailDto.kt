@@ -22,5 +22,13 @@ data class EmailDto(
             templateCode = EmailTemplateCode.SIGNUP_CONFIRM,
             variables = mapOf("code" to RandomUtils.generateRandomNumbers(6))
         )
+
+        fun ofFindId(
+            recipient: String
+        ) = EmailDto(
+            recipient = recipient,
+            templateCode = EmailTemplateCode.FIND_ID,
+            variables = mapOf("code" to RandomUtils.generateRandomNumbers(6))
+        )
     }
 }
