@@ -22,9 +22,7 @@ object CookieUtils {
         return ResponseCookie.from(cookieName, value) // TODO : 운영/개발 환경 확인 필요
             .maxAge(maxAge.toLong())
             .httpOnly(true)
-            .secure(true)
             .path("/")
-            .sameSite("None")
             .build()
     }
 
@@ -52,9 +50,7 @@ object CookieUtils {
         val cookie = ResponseCookie.from(cookieName, "")
             .maxAge(0)
             .httpOnly(true)
-            .secure(true)
             .path("/")
-            .sameSite("None")
             .build()
 
         response.addHeader("Set-Cookie", cookie.toString())
