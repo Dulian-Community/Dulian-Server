@@ -1,5 +1,9 @@
 package dulian.dulian.global.config.security
 
+import dulian.dulian.global.auth.jwt.components.JwtTokenProvider
+import dulian.dulian.global.auth.jwt.filter.JwtAuthenticationFilter
+import dulian.dulian.global.auth.jwt.handler.JwtAccessDeniedHandler
+import dulian.dulian.global.auth.jwt.handler.JwtAuthenticationEntryPoint
 import dulian.dulian.global.auth.oauth2.handler.OAuth2LoginFailureHandler
 import dulian.dulian.global.auth.oauth2.handler.OAuth2LoginSuccessHandler
 import dulian.dulian.global.auth.oauth2.service.CustomOAuth2UserService
@@ -11,13 +15,17 @@ import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 
 @Configuration
 @EnableWebSecurity
 class SecurityConfig(
     private val oAuth2LoginSuccessHandler: OAuth2LoginSuccessHandler,
     private val oAuth2LoginFailureHandler: OAuth2LoginFailureHandler,
-    private val oAuth2UserService: CustomOAuth2UserService
+    private val oAuth2UserService: CustomOAuth2UserService,
+    private val jwtTokenProvider: JwtTokenProvider,
+    private val jwtAuthenticationEntryPoint: JwtAuthenticationEntryPoint,
+    private val jwtAccessDeniedHandler: JwtAccessDeniedHandler
 ) {
 
     /**
@@ -65,6 +73,19 @@ class SecurityConfig(
                     .failureHandler(oAuth2LoginFailureHandler)
             }
 
+        // 예외 처리 설정
+        http.exceptionHandling {
+            it
+                .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                .accessDeniedHandler(jwtAccessDeniedHandler)
+        }
+
+        // JwtAuthenticationFilter 설정
+        http
+            .addFilterBefore(
+                JwtAuthenticationFilter(jwtTokenProvider),
+                UsernamePasswordAuthenticationFilter::class.java
+            )
         return http.build()
     }
 
