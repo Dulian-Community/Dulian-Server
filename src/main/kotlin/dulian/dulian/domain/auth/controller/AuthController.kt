@@ -4,6 +4,7 @@ import dulian.dulian.domain.auth.dto.LoginDto
 import dulian.dulian.domain.auth.dto.SignupConfirmDto
 import dulian.dulian.domain.auth.dto.SignupDto
 import dulian.dulian.domain.auth.service.LoginService
+import dulian.dulian.domain.auth.service.LogoutService
 import dulian.dulian.domain.auth.service.SignupService
 import dulian.dulian.domain.auth.service.TokenRefreshService
 import dulian.dulian.global.auth.jwt.dto.TokenDto
@@ -22,7 +23,8 @@ import org.springframework.web.bind.annotation.RestController
 class AuthController(
     private val signupService: SignupService,
     private val loginService: LoginService,
-    private val tokenRefreshService: TokenRefreshService
+    private val tokenRefreshService: TokenRefreshService,
+    private val logoutService: LogoutService
 ) {
 
     /**
@@ -68,5 +70,17 @@ class AuthController(
         request: HttpServletRequest
     ): ResponseEntity<ApiResponse<TokenDto.Token>> {
         return ApiResponse.success(tokenRefreshService.refresh(request))
+    }
+
+    /**
+     * 로그아웃 API
+     */
+    @PostMapping("/logout")
+    fun logout(
+        response: HttpServletResponse
+    ): ResponseEntity<ApiResponse<Unit>> {
+        logoutService.logout(response)
+
+        return ApiResponse.success()
     }
 }

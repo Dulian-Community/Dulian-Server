@@ -1,6 +1,7 @@
 package dulian.dulian.global.utils
 
 import jakarta.servlet.http.Cookie
+import jakarta.servlet.http.HttpServletResponse
 import org.springframework.http.ResponseCookie
 
 object CookieUtils {
@@ -39,5 +40,23 @@ object CookieUtils {
         name: String
     ): String? {
         return cookies?.find { it.name == name }?.value
+    }
+
+    /**
+     * 쿠키 삭제
+     */
+    fun removeCookie(
+        cookieName: String,
+        response: HttpServletResponse
+    ) {
+        val cookie = ResponseCookie.from(cookieName, "")
+            .maxAge(0)
+            .httpOnly(true)
+            .secure(true)
+            .path("/")
+            .sameSite("None")
+            .build()
+
+        response.addHeader("Set-Cookie", cookie.toString())
     }
 }
