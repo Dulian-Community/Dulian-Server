@@ -40,7 +40,7 @@ class OAuth2LoginSuccessHandler(
             refreshToken.token,
             refreshToken.expiresInSecond
         )
-        response?.addCookie(cookie)
+        response?.addHeader("Set-Cookie", cookie.toString())
 
         response?.sendRedirect("$redirectUrl/oauth2-login-success?accessToken=${accessToken.token}")
     }

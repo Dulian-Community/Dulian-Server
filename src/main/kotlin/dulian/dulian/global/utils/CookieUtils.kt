@@ -1,6 +1,7 @@
 package dulian.dulian.global.utils
 
 import jakarta.servlet.http.Cookie
+import org.springframework.http.ResponseCookie
 
 object CookieUtils {
 
@@ -16,13 +17,14 @@ object CookieUtils {
         cookieName: String,
         value: String,
         maxAge: Int
-    ): Cookie {
-        return Cookie(cookieName, value).apply {
-            this.maxAge = maxAge
-            this.isHttpOnly = true
-            this.secure = true
-            this.path = "/"
-        }
+    ): ResponseCookie {
+        return ResponseCookie.from(cookieName, value) // TODO : 운영/개발 환경 확인 필요
+            .maxAge(maxAge.toLong())
+            .httpOnly(true)
+            .secure(true)
+            .path("/")
+            .sameSite("None")
+            .build()
     }
 
     /**

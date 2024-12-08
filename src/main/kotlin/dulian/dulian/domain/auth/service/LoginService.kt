@@ -71,7 +71,7 @@ class LoginService(
             value = refreshToken.token,
             maxAge = refreshToken.expiresInSecond
         )
-        response.addCookie(cookie)
+        response.addHeader("Set-Cookie", cookie.toString())
 
         return accessToken
     }
