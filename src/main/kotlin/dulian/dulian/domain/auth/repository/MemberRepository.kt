@@ -15,4 +15,8 @@ interface MemberRepository : JpaRepository<Member, Long> {
     fun findByUserId(userId: String): Member?
 
     fun existsByUserIdAndSocialType(userId: String, socialType: SocialType): Boolean
+
+    fun findByEmail(email: String): Member?
+
+    fun findByEmailAndUserId(email: String, userId: String): Member?
 }

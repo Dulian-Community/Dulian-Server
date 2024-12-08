@@ -6,6 +6,7 @@ import dulian.dulian.global.auth.oauth2.data.OAuth2UserInfo
 import dulian.dulian.global.config.db.entity.BaseEntity
 import jakarta.persistence.*
 import org.hibernate.annotations.Comment
+import org.springframework.security.crypto.password.PasswordEncoder
 import java.util.*
 
 @Entity
@@ -24,7 +25,7 @@ class Member(
 
     @Column(name = "password", length = 100)
     @Comment("비밀번호")
-    val password: String? = null,
+    var password: String? = null,
 
     @Column(name = "email", length = 50, updatable = false)
     @Comment("이메일")
@@ -58,5 +59,12 @@ class Member(
             nickname = "user${UUID.randomUUID().toString().replace("-", "").substring(26)}",
             socialType = socialType
         )
+    }
+
+    fun resetPassword(
+        passwordEncoder: PasswordEncoder,
+        newPassword: String
+    ) {
+        this.password = passwordEncoder.encode(newPassword)
     }
 }

@@ -55,5 +55,14 @@ class EmailCode(
             email = email,
             emailTemplateCode = EmailTemplateCode.SIGNUP_CONFIRM
         )
+
+        fun ofFindId(
+            code: Int,
+            email: String
+        ) = EmailCode(
+            code = code.toString(),
+            email = email,
+            emailTemplateCode = EmailTemplateCode.FIND_ID
+        )
     }
 }
