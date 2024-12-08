@@ -84,6 +84,9 @@ dependencies {
     implementation("io.jsonwebtoken:jjwt-impl:${Versions.JWT_VERSION}")
     implementation("io.jsonwebtoken:jjwt-jackson:${Versions.JWT_VERSION}")
 
+    // Spring OAuth2
+    implementation("org.springframework.security:spring-security-oauth2-client")
+
     // MariaDB
     runtimeOnly("org.mariadb.jdbc:mariadb-java-client")
 

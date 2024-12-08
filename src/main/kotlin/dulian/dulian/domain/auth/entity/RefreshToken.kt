@@ -24,7 +24,7 @@ class RefreshToken(
     @Comment("만료일자")
     val expiredIn: LocalDateTime,
 
-    @Column(name = "user_id", length = 12, nullable = false, updatable = false)
+    @Column(name = "user_id", length = 100, nullable = false, updatable = false)
     @Comment("아이디")
     val userId: String
 ) {

@@ -1,5 +1,8 @@
 package dulian.dulian.global.config.security
 
+import dulian.dulian.global.auth.oauth2.handler.OAuth2LoginFailureHandler
+import dulian.dulian.global.auth.oauth2.handler.OAuth2LoginSuccessHandler
+import dulian.dulian.global.auth.oauth2.service.CustomOAuth2UserService
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
@@ -11,7 +14,11 @@ import org.springframework.security.web.SecurityFilterChain
 
 @Configuration
 @EnableWebSecurity
-class SecurityConfig {
+class SecurityConfig(
+    private val oAuth2LoginSuccessHandler: OAuth2LoginSuccessHandler,
+    private val oAuth2LoginFailureHandler: OAuth2LoginFailureHandler,
+    private val oAuth2UserService: CustomOAuth2UserService
+) {
 
     /**
      * PasswordEncoder Bean 등록
@@ -48,6 +55,14 @@ class SecurityConfig {
                 it
                     .requestMatchers(*PERMIT_ALL).permitAll()
                     .anyRequest().authenticated()
+            }
+
+        // OAuth2 설정
+        http
+            .oauth2Login { oauth2 ->
+                oauth2.userInfoEndpoint { it.userService(oAuth2UserService) }
+                    .successHandler(oAuth2LoginSuccessHandler)
+                    .failureHandler(oAuth2LoginFailureHandler)
             }
 
         return http.build()
