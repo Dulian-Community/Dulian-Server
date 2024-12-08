@@ -24,4 +24,18 @@ object CookieUtils {
             this.path = "/"
         }
     }
+
+    /**
+     * 쿠키 값 조회
+     *
+     * @param cookies 쿠키 배열
+     * @param name 쿠키명
+     * @return 쿠키값
+     */
+    fun getCookieValue(
+        cookies: Array<Cookie>?,
+        name: String
+    ): String? {
+        return cookies?.find { it.name == name }?.value
+    }
 }

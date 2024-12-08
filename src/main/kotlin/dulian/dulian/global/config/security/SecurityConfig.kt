@@ -74,7 +74,8 @@ class SecurityConfig(
             "/health-check",
             "/api/v1/auth/signup",
             "/api/v1/auth/signup/send-email-confirm-code",
-            "/api/v1/auth/login"
+            "/api/v1/auth/login",
+            "/api/v1/auth/refresh"
         )
     }
 }
