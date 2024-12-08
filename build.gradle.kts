@@ -5,6 +5,7 @@ object Versions {
     const val MOCKK_VERSION = "1.13.12"
     const val KOTEST_VERSION = "5.9.1"
     const val MAILJET_VERSION = "5.2.5"
+    const val JWT_VERSION = "0.12.6"
 }
 
 plugins {
@@ -77,6 +78,11 @@ dependencies {
 
     // Thymeleaf
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
+
+    // JWT
+    implementation("io.jsonwebtoken:jjwt-api:${Versions.JWT_VERSION}")
+    implementation("io.jsonwebtoken:jjwt-impl:${Versions.JWT_VERSION}")
+    implementation("io.jsonwebtoken:jjwt-jackson:${Versions.JWT_VERSION}")
 
     // MariaDB
     runtimeOnly("org.mariadb.jdbc:mariadb-java-client")

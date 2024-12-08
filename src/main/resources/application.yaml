@@ -3,3 +3,5 @@ spring:
         name: dulian
     profiles:
         active: ${profile}
+jwt:
+    secret: ENC(QEWIuRZd31xzDx1LjKLpyzKe12HqG2fXaawlV2gLULz1Pfx+q0uVyqgfUymLtKedgF2MsqYaraz9wWyLOkHDGIZaQL9jTTV/37IkSBpG+Hc=)

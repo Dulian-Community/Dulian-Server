@@ -1,6 +1,7 @@
 package dulian.dulian.domain.auth.entity
 
 import dulian.dulian.domain.auth.dto.SignupDto
+import dulian.dulian.global.auth.enums.SocialType
 import dulian.dulian.global.config.db.entity.BaseEntity
 import jakarta.persistence.*
 import org.hibernate.annotations.Comment
@@ -29,7 +30,12 @@ class Member(
 
     @Column(name = "nickname", length = 10, nullable = false)
     @Comment("닉네임")
-    val nickname: String
+    val nickname: String,
+
+    @Column(name = "social_type", length = 10, updatable = false, columnDefinition = "VARCHAR(10)")
+    @Enumerated(EnumType.STRING)
+    @Comment("소셜 로그인 타입")
+    val socialType: SocialType? = null
 ) : BaseEntity() {
 
     companion object {

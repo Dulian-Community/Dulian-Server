@@ -15,3 +15,6 @@ spring:
         mailjet:
             api-key: ENC(fkEgtAuS1J+DsnGdcUrJhS8rqHk1TsAe5cFuzHIwxya+2Smt6DI4FFztq2itbqnA)
             secret-key: ENC(y5YUIwN26uLcv10HSn96jHszgUiQebXadQow1wKJc8vouo3g6asWZlLFJTSwZX5h)
+jwt:
+    access-token-expiration: 1800 # 30분
+    refresh-token-expiration: 604800 # 7일
