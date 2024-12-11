@@ -39,7 +39,6 @@ class CustomOAuth2UserService(
             memberRepository.save(Member.ofOAuth2(oAuth2UserInfo, socialType))
         }
 
-        println(oAuth2UserInfo.getId())
         return CustomOAuth2User(
             attributes = if (socialType == SocialType.NAVER) {
                 @Suppress("UNCHECKED_CAST")
