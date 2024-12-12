@@ -1,3 +1,8 @@
+import com.epages.restdocs.apispec.gradle.OpenApi3Extension
+import org.hidetake.gradle.swagger.generator.GenerateSwaggerUI
+import org.springframework.boot.gradle.plugin.ResolveMainClassName
+import org.springframework.boot.gradle.tasks.bundling.BootJar
+
 object Versions {
     const val JASYPT_VERSION = "3.0.5"
     const val P6SPY_VERSION = "1.9.2"
@@ -6,6 +11,10 @@ object Versions {
     const val KOTEST_VERSION = "5.9.1"
     const val MAILJET_VERSION = "5.2.5"
     const val JWT_VERSION = "0.12.6"
+    const val SPRINGDOC_VERSION = "2.7.0"
+    const val SPRING_RESTDOCS_VERSION = "3.0.3"
+    const val RESTDOCS_API_SPEC_MOCKMVC_VERSION = "0.19.4"
+    const val SWAGGER_UI_VERSION = "5.18.2"
 }
 
 plugins {
@@ -15,6 +24,8 @@ plugins {
     id("io.spring.dependency-management") version "1.1.6"
     kotlin("plugin.jpa") version "1.9.25"
     kotlin("plugin.allopen") version "1.9.25"
+    id("com.epages.restdocs-api-spec") version "0.19.2" // Rest Docs 플러그인 추가
+    id("org.hidetake.swagger.generator") version "2.18.2" // SwaggerUI 플러그인 추가
 }
 
 apply(plugin = "kotlin-jpa")
@@ -87,6 +98,12 @@ dependencies {
     // Spring OAuth2
     implementation("org.springframework.security:spring-security-oauth2-client")
 
+    // Rest Docs
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:${Versions.SPRINGDOC_VERSION}")
+    testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc:${Versions.SPRING_RESTDOCS_VERSION}")
+    implementation("com.epages:restdocs-api-spec-mockmvc:${Versions.RESTDOCS_API_SPEC_MOCKMVC_VERSION}")
+    implementation("org.webjars:swagger-ui:${Versions.SWAGGER_UI_VERSION}")
+
     // MariaDB
     runtimeOnly("org.mariadb.jdbc:mariadb-java-client")
 
@@ -141,4 +158,42 @@ tasks {
 
 tasks.named<Jar>("jar") {
     enabled = false
+}
+
+swaggerSources {
+    create("sample") {
+        setInputFile(file("${project.buildDir}/api-spec/openapi3.yaml"))
+    }
+}
+
+configure<OpenApi3Extension> {
+    setServer("http://localhost:8081")
+    title = "Dulian API"
+    description = "Dulian API"
+    version = "1.0.0"
+    format = "YAML"
+//    outputDirectory = "build/docs"
+//    outputFileNamePrefix = "rest_docs"
+}
+
+tasks.withType<GenerateSwaggerUI>().configureEach {
+    dependsOn("openapi3")
+}
+
+tasks.register<Copy>("copySwaggerUI") {
+    dependsOn("generateSwaggerUISample")
+
+    // 복사할 소스 파일 설정
+    from(layout.buildDirectory.dir("api-spec/openapi3.yaml").get().asFile)
+
+    // 대상 디렉토리 설정
+    into(layout.buildDirectory.dir("resources/main/static/docs").get().asFile)
+}
+
+tasks.named<BootJar>("bootJar") {
+    dependsOn("copySwaggerUI")
+}
+
+tasks.named<ResolveMainClassName>("resolveMainClassName") {
+    dependsOn("copySwaggerUI")
 }
