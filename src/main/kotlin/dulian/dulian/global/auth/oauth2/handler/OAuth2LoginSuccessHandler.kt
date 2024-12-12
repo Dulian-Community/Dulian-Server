@@ -16,7 +16,9 @@ class OAuth2LoginSuccessHandler(
     private val jwtTokenProvider: JwtTokenProvider,
     private val refreshTokenRepository: RefreshTokenRepository,
     @Value("\${oauth2.redirect-url}")
-    private val redirectUrl: String
+    private val redirectUrl: String,
+    @Value("\${spring.profiles.active}")
+    private val activeProfile: String
 ) : AuthenticationSuccessHandler {
 
     override fun onAuthenticationSuccess(
@@ -34,14 +36,18 @@ class OAuth2LoginSuccessHandler(
             )
         )
 
-        // Refresh Token 쿠키에 담아 전달
-        val cookie = CookieUtils.createCookie(
-            "USER_REFRESH_TOKEN",
-            refreshToken.token,
-            refreshToken.expiresInSecond
-        )
-        response?.addHeader("Set-Cookie", cookie.toString())
-
-        response?.sendRedirect("$redirectUrl/oauth2-login-success?accessToken=${accessToken.token}")
+        // 환경에 따라 분리
+        if (activeProfile == "prod") {
+            // Refresh Token 쿠키에 담아 전달
+            val cookie = CookieUtils.createCookie(
+                "USER_REFRESH_TOKEN",
+                refreshToken.token,
+                refreshToken.expiresInSecond
+            )
+            response?.addHeader("Set-Cookie", cookie.toString())
+            response?.sendRedirect("$redirectUrl/oauth2-login-success?accessToken=${accessToken.token}&accessTokenExpiresIn=${accessToken.expiresIn}")
+        } else {
+            response?.sendRedirect("$redirectUrl/oauth2-login-success?accessToken=${accessToken.token}&accessTokenExpiresIn=${accessToken.expiresIn}&refreshToken=${refreshToken.token}&refreshTokenExpiresIn=${refreshToken.expiresIn}")
+        }
     }
 }
