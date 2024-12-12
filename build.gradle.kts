@@ -15,6 +15,7 @@ object Versions {
     const val SPRING_RESTDOCS_VERSION = "3.0.3"
     const val RESTDOCS_API_SPEC_MOCKMVC_VERSION = "0.19.4"
     const val SWAGGER_UI_VERSION = "5.18.2"
+    const val KOTEST_EXTENSIONS_SPRING_VERSION = "1.3.0"
 }
 
 plugins {
@@ -26,6 +27,7 @@ plugins {
     kotlin("plugin.allopen") version "1.9.25"
     id("com.epages.restdocs-api-spec") version "0.19.2" // Rest Docs 플러그인 추가
     id("org.hidetake.swagger.generator") version "2.18.2" // SwaggerUI 플러그인 추가
+    id("org.asciidoctor.jvm.convert") version "3.3.2"
 }
 
 apply(plugin = "kotlin-jpa")
@@ -103,11 +105,13 @@ dependencies {
     testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc:${Versions.SPRING_RESTDOCS_VERSION}")
     implementation("com.epages:restdocs-api-spec-mockmvc:${Versions.RESTDOCS_API_SPEC_MOCKMVC_VERSION}")
     implementation("org.webjars:swagger-ui:${Versions.SWAGGER_UI_VERSION}")
+    swaggerUI("org.webjars:swagger-ui:${Versions.SWAGGER_UI_VERSION}")
 
     // MariaDB
     runtimeOnly("org.mariadb.jdbc:mariadb-java-client")
 
     // Test
+    implementation("io.kotest.extensions:kotest-extensions-spring:${Versions.KOTEST_EXTENSIONS_SPRING_VERSION}")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testImplementation("org.springframework.security:spring-security-test")
@@ -115,6 +119,7 @@ dependencies {
     testImplementation("io.kotest:kotest-runner-junit5-jvm:${Versions.KOTEST_VERSION}")
     testImplementation("io.kotest:kotest-assertions-core-jvm:${Versions.KOTEST_VERSION}")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testImplementation("com.ninja-squad:springmockk:4.0.2")
 }
 
 kotlin {
@@ -171,9 +176,11 @@ configure<OpenApi3Extension> {
     title = "Dulian API"
     description = "Dulian API"
     version = "1.0.0"
-    format = "YAML"
+    format = "yaml"
+//    snippetsDirectory = "build/generated-snippets"
 //    outputDirectory = "build/docs"
 //    outputFileNamePrefix = "rest_docs"
+//    outputDirectory = "build/resources/main/static/docs"
 }
 
 tasks.withType<GenerateSwaggerUI>().configureEach {

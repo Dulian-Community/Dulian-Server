@@ -1,49 +1,113 @@
 package dulian.dulian.domain.auth.controller
 
+import com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.document
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.ninjasquad.springmockk.MockkBean
 import dulian.dulian.domain.auth.dto.SignupDto
+import dulian.dulian.domain.auth.service.LoginService
+import dulian.dulian.domain.auth.service.LogoutService
 import dulian.dulian.domain.auth.service.SignupService
-import io.kotest.core.spec.style.BehaviorSpec
+import dulian.dulian.domain.auth.service.TokenRefreshService
+import io.kotest.core.spec.style.DescribeSpec
 import io.mockk.Runs
 import io.mockk.every
 import io.mockk.just
-import io.mockk.mockk
+import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
-import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders
-import org.springframework.test.web.servlet.MockMvc
+import org.springframework.restdocs.ManualRestDocumentation
+import org.springframework.restdocs.RestDocumentationExtension
+import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.request
+import org.springframework.restdocs.operation.preprocess.Preprocessors
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder
+import org.springframework.test.web.servlet.setup.MockMvcBuilders
+import org.springframework.web.context.WebApplicationContext
 
 @WebMvcTest(AuthController::class)
-class AuthControllerTest constructor(
-    @Autowired val mockMvc: MockMvc
-) : BehaviorSpec({
+@ExtendWith(RestDocumentationExtension::class)
+class AuthControllerTest(
+    @MockkBean
+    private val signupService: SignupService,
 
-    val signupService = mockk<SignupService>()
+    @MockkBean
+    private val loginService: LoginService,
 
-    Context("회원가입 API") {
-        Given("회원가입 요청이 들어왔을 때") {
+    @MockkBean
+    private val tokenRefreshService: TokenRefreshService,
+
+    @MockkBean
+    private val logoutService: LogoutService,
+
+    @Autowired
+    private val context: WebApplicationContext
+) : DescribeSpec({
+
+    val restDocumentation = ManualRestDocumentation()
+    val mockMVc = MockMvcBuilders.webAppContextSetup(context)
+        .apply<DefaultMockMvcBuilder>(
+            MockMvcRestDocumentation.documentationConfiguration(restDocumentation)
+                .operationPreprocessors()
+                .withRequestDefaults(Preprocessors.prettyPrint())
+                .withResponseDefaults(Preprocessors.prettyPrint())
+        )
+//		.apply<DefaultMockMvcBuilder>(SecurityMockMvcConfigurers.springSecurity(MockSecurityFilter()))
+//		.addFilter<DefaultMockMvcBuilder>(CharacterEncodingFilter("UTF-8", true))
+        .alwaysDo<DefaultMockMvcBuilder>(MockMvcResultHandlers.print())
+        .build()
+
+    val objectMapper = ObjectMapper()
+
+    beforeEach { restDocumentation.beforeTest(javaClass, it.name.testName) }
+    afterEach { restDocumentation.afterTest() }
+
+    describe("Test 1") {
+
+        context("Test 2") {
+
             val request = SignupDto.Request(
-                userId = "test",
+                userId = "test12345",
                 email = "test@test.com",
                 emailConfirmCode = "1234",
-                password = "test",
-                passwordConfirm = "test",
-                nickname = "test",
+                password = "Test1234!",
+                passwordConfirm = "Test1234!",
+                nickname = "test"
             )
+
             every { signupService.signup(request) } just Runs
 
-            When("회원가입을 하면") {
-                val actions = mockMvc.perform(
-                    RestDocumentationRequestBuilders.post("/api/v1/auth/signup")
+            it("Test 3") {
+//                mockMVc.post("/api/v1/auth/signup") {
+//                    contentType = MediaType.APPLICATION_JSON
+//                    content = objectMapper.writeValueAsString(request)
+//                }.andExpect {
+//                    status { isOk() }
+//                }.andDo {
+//                    document(
+//                        "signup",
+//                        Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+//                        Preprocessors.preprocessResponse(Preprocessors.prettyPrint())
+//                    )
+//                }
+
+                mockMVc.perform(
+                    request(HttpMethod.POST, "/api/v1/auth/signup")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .with(csrf)
+                        .content(objectMapper.writeValueAsString(request))
                 )
-
-
-                Then("회원가입이 성공해야 한다") {
-                }
+                    .andExpect(status().isOk)
+                    .andDo(
+                        document(
+                            "signup",
+                            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                            Preprocessors.preprocessResponse(Preprocessors.prettyPrint())
+                        )
+                    )
             }
         }
     }
-}) {
-}
+})
