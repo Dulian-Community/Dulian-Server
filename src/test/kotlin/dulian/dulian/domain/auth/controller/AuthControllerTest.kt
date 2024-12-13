@@ -220,7 +220,7 @@ class AuthControllerTest(
                         .andExpect(status().isBadRequest)
                         .andDo(
                             document(
-                                "실패 - 비밀번호 불일치",
+                                "실패 - 이메일 인증 실패",
                                 Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
                                 Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
                                 resource(

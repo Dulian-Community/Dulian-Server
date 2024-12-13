@@ -17,6 +17,7 @@ object Versions {
     const val SWAGGER_UI_VERSION = "5.18.2"
     const val KOTEST_EXTENSIONS_SPRING_VERSION = "1.3.0"
     const val SPRING_MOCKK_VERSION = "4.0.2"
+    const val FIXTURE_MONKEY_VERSION = "1.1.5"
 }
 
 plugins {
@@ -121,6 +122,7 @@ dependencies {
     testImplementation("io.kotest:kotest-assertions-core-jvm:${Versions.KOTEST_VERSION}")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation("com.ninja-squad:springmockk:${Versions.SPRING_MOCKK_VERSION}")
+    testImplementation("com.navercorp.fixturemonkey:fixture-monkey-starter-kotlin:${Versions.FIXTURE_MONKEY_VERSION}")
 }
 
 kotlin {
