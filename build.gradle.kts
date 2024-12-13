@@ -16,6 +16,7 @@ object Versions {
     const val RESTDOCS_API_SPEC_MOCKMVC_VERSION = "0.19.4"
     const val SWAGGER_UI_VERSION = "5.18.2"
     const val KOTEST_EXTENSIONS_SPRING_VERSION = "1.3.0"
+    const val SPRING_MOCKK_VERSION = "4.0.2"
 }
 
 plugins {
@@ -119,7 +120,7 @@ dependencies {
     testImplementation("io.kotest:kotest-runner-junit5-jvm:${Versions.KOTEST_VERSION}")
     testImplementation("io.kotest:kotest-assertions-core-jvm:${Versions.KOTEST_VERSION}")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-    testImplementation("com.ninja-squad:springmockk:4.0.2")
+    testImplementation("com.ninja-squad:springmockk:${Versions.SPRING_MOCKK_VERSION}")
 }
 
 kotlin {
@@ -165,29 +166,32 @@ tasks.named<Jar>("jar") {
     enabled = false
 }
 
+// 생성된 API 스펙이 위치할 디렉토리 설정
 swaggerSources {
     create("sample") {
-        setInputFile(file("${project.buildDir}/api-spec/openapi3.yaml"))
+        setInputFile(file(layout.buildDirectory.dir("api-spec/openapi3.yaml").get().asFile))
     }
 }
 
+// OpenAPI 3.0 설정
 configure<OpenApi3Extension> {
-    setServer("http://localhost:8081")
+    setServer("http://localhost:8080")
     title = "Dulian API"
     description = "Dulian API"
     version = "1.0.0"
     format = "yaml"
-//    snippetsDirectory = "build/generated-snippets"
-//    outputDirectory = "build/docs"
-//    outputFileNamePrefix = "rest_docs"
-//    outputDirectory = "build/resources/main/static/docs"
 }
 
+// Swagger UI 설정
 tasks.withType<GenerateSwaggerUI>().configureEach {
     dependsOn("openapi3")
 }
 
+// Swagger UI 복사 작업 설정
 tasks.register<Copy>("copySwaggerUI") {
+    description = "Copy Swagger UI to resources"
+    group = "documentation"
+
     dependsOn("generateSwaggerUISample")
 
     // 복사할 소스 파일 설정
@@ -197,10 +201,12 @@ tasks.register<Copy>("copySwaggerUI") {
     into(layout.buildDirectory.dir("resources/main/static/docs").get().asFile)
 }
 
+// BootJar 작업에 Swagger UI 복사 작업 추가
 tasks.named<BootJar>("bootJar") {
     dependsOn("copySwaggerUI")
 }
 
+// ResolveMainClassName 작업에 Swagger UI 복사 작업 추가
 tasks.named<ResolveMainClassName>("resolveMainClassName") {
     dependsOn("copySwaggerUI")
 }
