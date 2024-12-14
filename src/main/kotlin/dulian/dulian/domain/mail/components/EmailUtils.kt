@@ -103,7 +103,7 @@ class EmailUtils(
         val context = Context()
         context.setVariables(variables)
 
-        return templateEngine.process("/mail/${templateCode.templateName}", context)
+        return templateEngine.process("mail/${templateCode.templateName}", context)
     }
 
     /**
