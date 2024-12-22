@@ -18,6 +18,7 @@ object Versions {
     const val KOTEST_EXTENSIONS_SPRING_VERSION = "1.3.0"
     const val SPRING_MOCKK_VERSION = "4.0.2"
     const val FIXTURE_MONKEY_VERSION = "1.1.5"
+    const val AMAZON_VERSION = "2.2.6.RELEASE"
 }
 
 plugins {
@@ -111,6 +112,9 @@ dependencies {
 
     // MariaDB
     runtimeOnly("org.mariadb.jdbc:mariadb-java-client")
+
+    // AWS
+    implementation("org.springframework.cloud:spring-cloud-starter-aws:${Versions.AMAZON_VERSION}")
 
     // Test
     implementation("io.kotest.extensions:kotest-extensions-spring:${Versions.KOTEST_EXTENSIONS_SPRING_VERSION}")

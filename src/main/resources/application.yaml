@@ -3,6 +3,10 @@ spring:
         name: dulian
     profiles:
         active: ${profile}
+    servlet:
+        multipart:
+            max-file-size: 10MB
+            max-request-size: 10MB
 jwt:
     secret: ENC(QEWIuRZd31xzDx1LjKLpyzKe12HqG2fXaawlV2gLULz1Pfx+q0uVyqgfUymLtKedgF2MsqYaraz9wWyLOkHDGIZaQL9jTTV/37IkSBpG+Hc=)
 springdoc:
@@ -11,3 +15,5 @@ springdoc:
     swagger-ui:
         url: /docs/openapi3.yaml
         path: /docs/swagger
+file:
+    image-extensions: jpg,jpeg,png,heic

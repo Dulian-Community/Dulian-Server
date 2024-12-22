@@ -56,3 +56,12 @@ jwt:
     refresh-token-expiration: 604800 # 7일
 oauth2:
     redirect-url: ENC(YdFoDd+MI8RpMvk8lafkycDd1XD17thhXU1ZEZQWkxOphCs105IuMpYeBY7a6Zlh)
+cloud:
+    aws:
+        s3:
+            bucket: ENC(8TtH6zxSx7qz6f3FEWfk8XCRKn0QO7dl)
+            region.static: ENC(DesqL5hqkN47Vf9ghUrgPeYGVhDbv7Eh)
+            stack.auto: false
+            credentials:
+                access-key: ENC(GPIDwoFZ0HHtcdDnY7pF+fwH/i4ZGOMfUioBR7jMVRo=)
+                secret-key: ENC(cXirqUbAcuFILdIapW5HNX4UKHkDpeRx8QJHCXjtwS9piw5tmZmf+3FH32PXXT8JLwNTvBo7GuI=)
