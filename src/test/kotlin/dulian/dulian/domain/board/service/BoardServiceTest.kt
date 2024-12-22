@@ -15,7 +15,6 @@ import io.kotest.core.spec.IsolationMode
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every
-import io.mockk.just
 import io.mockk.mockk
 import io.mockk.verify
 import org.springframework.mock.web.MockMultipartFile
@@ -73,7 +72,7 @@ class BoardServiceTest : BehaviorSpec({
 
             every { memberRepository.findByUserId(any()) } returns member
             every { boardRepository.save(any()) } returns mockk()
-            every { fileService.saveImageAtchFiles(any(), any()) } just mockk()
+            every { fileService.saveImageAtchFiles(any(), any()) } returns mockk()
 
             When("게시물 등록 시") {
                 boardService.addBoard(request, listOf(file))
@@ -81,9 +80,7 @@ class BoardServiceTest : BehaviorSpec({
                 Then("성공") {
                     verify { memberRepository.findByUserId(any()) }
                     verify { boardRepository.save(any()) }
-                    verify {
-                        fileService.saveImageAtchFiles(any(), any())
-                    }
+                    verify { fileService.saveImageAtchFiles(any(), any()) }
                 }
             }
         }
