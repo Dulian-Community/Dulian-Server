@@ -6,7 +6,6 @@ import dulian.dulian.domain.file.entity.AtchFileDetail
 import dulian.dulian.domain.file.enums.S3Folder
 import dulian.dulian.domain.file.exception.FileErrorCode
 import dulian.dulian.domain.file.repository.AtchFileDetailRepository
-import dulian.dulian.domain.file.repository.AtchFileRepository
 import dulian.dulian.global.exception.CustomException
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
@@ -18,7 +17,6 @@ import java.util.*
 @Service
 class FileService(
     private val s3Utils: S3Utils,
-    private val atchFileRepository: AtchFileRepository,
     private val atchFileDetailRepository: AtchFileDetailRepository,
     @Value("\${file.image-extensions}")
     private val imageExtensions: String,
