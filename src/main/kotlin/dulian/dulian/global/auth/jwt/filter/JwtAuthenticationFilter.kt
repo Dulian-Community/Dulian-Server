@@ -27,7 +27,6 @@ class JwtAuthenticationFilter(
         } catch (e: CustomException) {
             SecurityContextHolder.clearContext()
             request.setAttribute("exception", e)
-            return
         }
 
         filterChain.doFilter(request, response)
