@@ -3,41 +3,66 @@ package dulian.dulian.domain.board.service
 import dulian.dulian.domain.auth.repository.MemberRepository
 import dulian.dulian.domain.board.dto.GeneralBoardAddDto
 import dulian.dulian.domain.board.entity.Board
+import dulian.dulian.domain.board.entity.Tag
 import dulian.dulian.domain.board.repository.BoardRepository
+import dulian.dulian.domain.board.repository.TagRepository
 import dulian.dulian.domain.file.entity.AtchFile
-import dulian.dulian.domain.file.enums.S3Folder
-import dulian.dulian.domain.file.service.FileService
+import dulian.dulian.domain.file.repository.AtchFileDetailRepository
+import dulian.dulian.domain.file.repository.AtchFileRepository
 import dulian.dulian.global.exception.CommonErrorCode
 import dulian.dulian.global.exception.CustomException
 import dulian.dulian.global.utils.SecurityUtils
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import org.springframework.web.multipart.MultipartFile
 
 @Service
 class BoardService(
     private val boardRepository: BoardRepository,
     private val memberRepository: MemberRepository,
-    private val fileService: FileService
+    private val atchFileRepository: AtchFileRepository,
+    private val atchFileDetailRepository: AtchFileDetailRepository,
+    private val tagRepository: TagRepository
 ) {
 
     @Transactional
     fun addBoard(
         request: GeneralBoardAddDto.Request,
-        images: List<MultipartFile>?
     ) {
         // 사용자 정보 조회
         val member = memberRepository.findByUserId(SecurityUtils.getCurrentUserId())
             ?: throw CustomException(CommonErrorCode.UNAUTHORIZED)
 
         // 이미지 저장
-        var atchFile: AtchFile? = null
-        if (images?.isNotEmpty() == true) {
-            atchFile = fileService.saveImageAtchFiles(images, S3Folder.GENERAL_BOARD)
-        }
+        val atchFile = saveImage(request.images)
 
         // 게시물 저장
         val board = Board.of(request, member, atchFile)
         boardRepository.save(board)
+
+        // Tag 저장
+        request.tags.forEach {
+            tagRepository.save(Tag.of(it, board))
+        }
+    }
+
+    private fun saveImage(
+        images: List<Long>
+    ): AtchFile? {
+        if (images.isEmpty()) {
+            return null
+        }
+
+        // 이미지가 이미 다른 게시물에 사용되었는지 체크 및 업로드한 이미지 개수와 일치하는지 체크
+        val savedAtchFileDetails = atchFileDetailRepository.findByAtchFileDetailIdIn(images).count {
+            it.atchFile?.atchFileId == null
+        }
+        if (savedAtchFileDetails != images.size) {
+            throw CustomException(CommonErrorCode.INVALID_PARAMETER)
+        }
+
+        val atchFile = atchFileRepository.save(AtchFile())
+        atchFileDetailRepository.updateAtchFileDetails(images, atchFile.atchFileId!!)
+
+        return atchFile
     }
 }

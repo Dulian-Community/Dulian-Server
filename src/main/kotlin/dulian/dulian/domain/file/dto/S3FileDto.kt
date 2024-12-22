@@ -1,8 +1,16 @@
 package dulian.dulian.domain.file.dto
 
-import org.springframework.web.multipart.MultipartFile
-
 data class S3FileDto(
-    val fileName: String,
-    val multipartFile: MultipartFile
-)
+    val atchFileDetailId: Long,
+    val atchFileUrl: String
+) {
+    companion object {
+        fun of(
+            atchFileDetailId: Long,
+            atchFileUrl: String
+        ) = S3FileDto(
+            atchFileDetailId = atchFileDetailId,
+            atchFileUrl = atchFileUrl
+        )
+    }
+}

@@ -14,8 +14,8 @@ class AtchFile(
     @Comment("첨부파일 정보 IDX")
     val atchFileId: Long? = null,
 
-    @OneToMany(mappedBy = "atchFile", fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST])
-    var atchFileDetails: MutableList<AtchFileDetail> = mutableListOf()
+    @OneToMany(mappedBy = "atchFile", fetch = FetchType.LAZY)
+    val atchFileDetails: MutableList<AtchFileDetail> = mutableListOf()
 ) : BaseEntity() {
     
 }

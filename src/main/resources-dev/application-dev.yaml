@@ -60,8 +60,9 @@ cloud:
     aws:
         s3:
             bucket: ENC(8TtH6zxSx7qz6f3FEWfk8XCRKn0QO7dl)
-            region.static: ENC(DesqL5hqkN47Vf9ghUrgPeYGVhDbv7Eh)
+            region.static: ENC(z+3/W5lP5K6RPxqWN8HX1ZswBJQPn+JC)
             stack.auto: false
             credentials:
                 access-key: ENC(GPIDwoFZ0HHtcdDnY7pF+fwH/i4ZGOMfUioBR7jMVRo=)
                 secret-key: ENC(cXirqUbAcuFILdIapW5HNX4UKHkDpeRx8QJHCXjtwS9piw5tmZmf+3FH32PXXT8JLwNTvBo7GuI=)
+            url: ENC(H1gQp8GG9Cu+vciZbqtpOvyZ1nbf99LXVfK6ios6PRlbNp3LWtr6ZdJCT2U29RKG+vJjNKETLFWD4i3PHhiiSA==)

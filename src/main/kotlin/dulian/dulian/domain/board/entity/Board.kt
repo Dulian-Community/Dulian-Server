@@ -28,7 +28,7 @@ class Board(
     @Comment("제목")
     val title: String,
 
-    @Column(name = "content", length = 1000, nullable = false)
+    @Column(name = "content", nullable = false, columnDefinition = "TEXT")
     @Comment("내용")
     val content: String,
 
@@ -45,7 +45,7 @@ class Board(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "atch_file_id", nullable = true, foreignKey = ForeignKey(ConstraintMode.NO_CONSTRAINT))
     @Comment("첨부파일 정보 IDX")
-    val atchFile: AtchFile? = null
+    val atchFile: AtchFile? = null,
 ) : BaseEntity() {
 
     companion object {

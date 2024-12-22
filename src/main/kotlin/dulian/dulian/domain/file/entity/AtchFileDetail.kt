@@ -37,7 +37,7 @@ class AtchFileDetail(
     val s3Folder: String,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "atch_file_id", nullable = false, foreignKey = ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "atch_file_id", foreignKey = ForeignKey(ConstraintMode.NO_CONSTRAINT))
     @Comment("첨부파일 정보 IDX")
     var atchFile: AtchFile? = null
 ) : BaseEntity() {
