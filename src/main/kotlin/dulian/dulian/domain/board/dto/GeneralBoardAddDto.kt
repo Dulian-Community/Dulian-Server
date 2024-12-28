@@ -17,16 +17,16 @@ class GeneralBoardAddDto {
         val content: String,
 
         @field:Size(max = 5, message = "태그는 5개 이내로 입력해주세요.")
-        val tags: List<String>,
+        val tags: List<String>?,
 
         @field:Size(max = 9, message = "이미지는 9개 이내로 입력해주세요.")
-        val images: List<Long>
+        val images: List<Long>?
     ) {
         /**
          * 태그 글자수 체크
          */
         fun checkTags() {
-            this.tags.forEach {
+            this.tags?.forEach {
                 require(it.length <= 10) {
                     throw CustomException(BoardErrorCode.TOO_LONG_TAG)
                 }

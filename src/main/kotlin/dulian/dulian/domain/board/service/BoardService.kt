@@ -14,6 +14,7 @@ import dulian.dulian.domain.file.repository.AtchFileRepository
 import dulian.dulian.global.exception.CommonErrorCode
 import dulian.dulian.global.exception.CustomException
 import dulian.dulian.global.utils.SecurityUtils
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -28,6 +29,8 @@ class BoardService(
     @Value("\${cloud.aws.s3.url}")
     private val s3Url: String
 ) {
+
+    private val log = KotlinLogging.logger { }
 
     @Transactional
     fun addBoard(
@@ -45,7 +48,7 @@ class BoardService(
         boardRepository.save(board)
 
         // Tag 저장
-        request.tags.forEach {
+        request.tags?.forEach {
             tagRepository.save(Tag.of(it, board))
         }
     }
@@ -69,9 +72,9 @@ class BoardService(
     }
 
     private fun saveImage(
-        images: List<Long>
+        images: List<Long>?
     ): AtchFile? {
-        if (images.isEmpty()) {
+        if (images.isNullOrEmpty()) {
             return null
         }
 
@@ -80,6 +83,7 @@ class BoardService(
             it.atchFile?.atchFileId == null
         }
         if (savedAtchFileDetails != images.size) {
+            log.error { "다른 게시물에 사용된 이미지 사용 : $images" }
             throw CustomException(CommonErrorCode.INVALID_PARAMETER)
         }
 
