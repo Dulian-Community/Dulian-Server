@@ -28,11 +28,11 @@ class Board(
 
     @Column(name = "title", length = 100, nullable = false)
     @Comment("제목")
-    val title: String,
+    var title: String,
 
     @Column(name = "content", nullable = false, columnDefinition = "TEXT")
     @Comment("내용")
-    val content: String,
+    var content: String,
 
     @Column(name = "view_count", nullable = false)
     @Comment("조회수")
@@ -48,14 +48,28 @@ class Board(
     @Comment("회원 정보 IDX")
     val member: Member,
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "atch_file_id", nullable = true, foreignKey = ForeignKey(ConstraintMode.NO_CONSTRAINT))
     @Comment("첨부파일 정보 IDX")
-    val atchFile: AtchFile? = null,
+    var atchFile: AtchFile? = null,
 
     @OneToMany(mappedBy = "board", fetch = FetchType.LAZY)
-    val tags: List<Tag>? = null
+    val tags: Set<Tag>? = null
 ) : BaseEntity() {
+
+    fun modifyBoard(
+        title: String,
+        content: String
+    ) {
+        this.title = title
+        this.content = content
+    }
+
+    fun createAtchFile(
+        atchFile: AtchFile
+    ) {
+        this.atchFile = atchFile
+    }
 
     companion object {
         fun of(

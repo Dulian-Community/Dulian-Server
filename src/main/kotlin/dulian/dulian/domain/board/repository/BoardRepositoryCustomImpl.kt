@@ -77,8 +77,12 @@ class BoardRepositoryCustomImpl(
             }
 
             // 태그가 없는 경우 null 처리
-            if (tags?.any { it.tagId == null } == true) {
-                tags = null
+            tags = if (tags?.any { it.tagId == null } == true) {
+                null
+            } else {
+                tags?.distinctBy {
+                    it.tagId
+                }
             }
         }
 

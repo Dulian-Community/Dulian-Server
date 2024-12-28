@@ -3,6 +3,7 @@ package dulian.dulian.domain.board.entity
 import dulian.dulian.global.config.db.entity.BaseEntity
 import jakarta.persistence.*
 import org.hibernate.annotations.Comment
+import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.SQLRestriction
 
 @Entity
@@ -13,21 +14,22 @@ import org.hibernate.annotations.SQLRestriction
     ]
 )
 @SQLRestriction("use_flag <> 'N'")
+@SQLDelete(sql = "UPDATE tag SET use_flag = 'N' WHERE tag_id = ?")
 class Tag(
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Comment("태그 정보 IDX")
-    private val tagId: Long? = null,
+    val tagId: Long? = null,
 
     @Column(name = "name", length = 10, nullable = false, updatable = false)
     @Comment("태그명")
-    private val name: String,
+    val name: String,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id", nullable = false, foreignKey = ForeignKey(ConstraintMode.NO_CONSTRAINT))
     @Comment("게시물 정보 IDX")
-    private val board: Board
+    val board: Board
 ) : BaseEntity() {
 
     companion object {

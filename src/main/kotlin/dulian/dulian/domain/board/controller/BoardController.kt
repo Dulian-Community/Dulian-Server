@@ -1,6 +1,7 @@
 package dulian.dulian.domain.board.controller
 
 import dulian.dulian.domain.board.dto.BoardDto
+import dulian.dulian.domain.board.dto.BoardModifyDto
 import dulian.dulian.domain.board.dto.GeneralBoardAddDto
 import dulian.dulian.domain.board.service.BoardService
 import dulian.dulian.domain.file.dto.S3FileDto
@@ -53,5 +54,20 @@ class BoardController(
         @PathVariable("boardId") boardId: Long
     ): ResponseEntity<ApiResponse<BoardDto>> {
         return ApiResponse.success(boardService.getBoard(boardId))
+    }
+
+    /**
+     * 게시물 수정 API
+     */
+    @PutMapping
+    fun modifyBoard(
+        @RequestBody @Valid request: BoardModifyDto.Request
+    ): ResponseEntity<ApiResponse<Unit>> {
+        // Request 검증
+        request.checkValid()
+
+        boardService.modifyBoard(request)
+
+        return ApiResponse.success()
     }
 }

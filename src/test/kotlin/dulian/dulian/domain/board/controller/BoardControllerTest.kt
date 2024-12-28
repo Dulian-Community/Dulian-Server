@@ -10,6 +10,7 @@ import com.navercorp.fixturemonkey.jakarta.validation.plugin.JakartaValidationPl
 import com.navercorp.fixturemonkey.kotlin.KotlinPlugin
 import com.ninjasquad.springmockk.MockkBean
 import dulian.dulian.domain.board.dto.BoardDto
+import dulian.dulian.domain.board.dto.BoardModifyDto
 import dulian.dulian.domain.board.dto.GeneralBoardAddDto
 import dulian.dulian.domain.board.exception.BoardErrorCode
 import dulian.dulian.domain.board.service.BoardService
@@ -296,6 +297,133 @@ class BoardControllerTest(
                                 ResourceSnippetParameters.builder()
                                     .tag("게시물")
                                     .summary("게시물 상세 조회 API")
+                                    .build()
+                            )
+                        )
+                    )
+            }
+        }
+    }
+
+    describe("게시물 수정 API") {
+        val request = fixtureMonkey.giveMeBuilder(BoardModifyDto.Request::class.java)
+            .set("tags", listOf("1234567890"))
+            .sample()
+        val fields = ConstrainedFields(BoardModifyDto.Request::class.java)
+        val fieldDescriptors = listOf(
+            fields.withPath("boardId").description("게시물 ID"),
+            fields.withPath("title").description("제목"),
+            fields.withPath("content").description("내용"),
+            fields.withPath("tags").description("태그"),
+            fields.withPath("savedTagIds").description("저장된 태그 ID"),
+            fields.withPath("images").description("이미지")
+        )
+
+        context("태그 개수가 5개 초과인 경우") {
+            val wrongRequest = fixtureMonkey.giveMeBuilder(BoardModifyDto.Request::class.java)
+                .set("tags", listOf("1", "2", "3", "4", "5", "6"))
+                .sample()
+
+            it("실패") {
+                mockMvc.perform(
+                    put("/api/v1/board")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(wrongRequest))
+                )
+                    .andExpect(status().isBadRequest)
+                    .andExpect(jsonPath("message").value(BoardErrorCode.TOO_MANY_5_TAGS.message))
+                    .andDo(
+                        document(
+                            "실패 - 태그 개수가 5개 초과인 경우",
+                            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                            resource(
+                                ResourceSnippetParameters.builder()
+                                    .tag("게시물")
+                                    .summary("게시물 수정 API")
+                                    .build()
+                            )
+                        )
+                    )
+            }
+        }
+
+        context("태그 글자수가 10보다 큰 경우") {
+            val wrongRequest = fixtureMonkey.giveMeBuilder(BoardModifyDto.Request::class.java)
+                .set("tags", listOf("12345678901"))
+                .sample()
+
+            it("실패") {
+                mockMvc.perform(
+                    put("/api/v1/board")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(wrongRequest))
+                )
+                    .andExpect(status().isBadRequest)
+                    .andExpect(jsonPath("message").value(BoardErrorCode.TOO_LONG_TAG.message))
+                    .andDo(
+                        document(
+                            "실패 - 태그 글자수가 10보다 큰 경우",
+                            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                            resource(
+                                ResourceSnippetParameters.builder()
+                                    .tag("게시물")
+                                    .summary("게시물 수정 API")
+                                    .build()
+                            )
+                        )
+                    )
+            }
+        }
+
+        context("정상적인 요청인 경우") {
+            every { boardService.modifyBoard(request) } just Runs
+
+            it("성공") {
+                mockMvc.perform(
+                    put("/api/v1/board")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request))
+                )
+                    .andExpect(status().isOk)
+                    .andDo(
+                        document(
+                            "성공 - 정상적인 요청인 경우",
+                            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                            resource(
+                                ResourceSnippetParameters.builder()
+                                    .tag("게시물")
+                                    .summary("게시물 수정 API")
+                                    .requestFields(fieldDescriptors)
+                                    .build()
+                            )
+                        )
+                    )
+            }
+        }
+
+        context("게시물이 존재하지 않거나 본인의 게시물이 아닌 경우") {
+            every { boardService.modifyBoard(any()) } throws CustomException(BoardErrorCode.BOARD_NOT_FOUND)
+
+            it("에러 코드 반환") {
+                mockMvc.perform(
+                    put("/api/v1/board")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request))
+                )
+                    .andExpect(status().isNotFound)
+                    .andExpect(jsonPath("message").value(BoardErrorCode.BOARD_NOT_FOUND.message))
+                    .andDo(
+                        document(
+                            "실패 - 게시물이 존재하지 않거나 본인의 게시물이 아닌 경우",
+                            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                            resource(
+                                ResourceSnippetParameters.builder()
+                                    .tag("게시물")
+                                    .summary("게시물 수정 API")
                                     .build()
                             )
                         )
