@@ -1,5 +1,6 @@
 package dulian.dulian.global.config.db
 
+import com.querydsl.jpa.JPQLTemplates
 import com.querydsl.jpa.impl.JPAQueryFactory
 import jakarta.persistence.EntityManager
 import jakarta.persistence.PersistenceContext
@@ -14,6 +15,6 @@ class QueryDslConfig {
 
     @Bean
     fun jpaQueryFactory(): JPAQueryFactory {
-        return JPAQueryFactory(entityManager)
+        return JPAQueryFactory(JPQLTemplates.DEFAULT, entityManager)
     }
 }

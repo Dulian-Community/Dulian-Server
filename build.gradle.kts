@@ -152,6 +152,7 @@ allOpen {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+    systemProperty("jasypt.encryptor.password", System.getProperty("jasypt.encryptor.password"))
 }
 
 // 환경별 설정 파일을 사용하기 위한 설정

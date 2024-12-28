@@ -9,6 +9,7 @@ import com.navercorp.fixturemonkey.FixtureMonkey
 import com.navercorp.fixturemonkey.jakarta.validation.plugin.JakartaValidationPlugin
 import com.navercorp.fixturemonkey.kotlin.KotlinPlugin
 import com.ninjasquad.springmockk.MockkBean
+import dulian.dulian.domain.board.dto.BoardDto
 import dulian.dulian.domain.board.dto.GeneralBoardAddDto
 import dulian.dulian.domain.board.exception.BoardErrorCode
 import dulian.dulian.domain.board.service.BoardService
@@ -30,8 +31,7 @@ import org.springframework.restdocs.RestDocumentationExtension
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation
 import org.springframework.restdocs.operation.preprocess.Preprocessors
 import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
@@ -207,6 +207,95 @@ class BoardControllerTest(
                                         fieldWithPath("statusCode").description("상태 코드"),
                                         fieldWithPath("timestamp").description("응답 시간"),
                                     )
+                                    .build()
+                            )
+                        )
+                    )
+            }
+        }
+    }
+
+    describe("게시물 상세 조회 API") {
+        val board = fixtureMonkey.giveMeBuilder(BoardDto::class.java)
+            .set("boardId", 1L)
+            .set("images", listOf(BoardDto.AtchFileDetailsDto(1L, "test.png", "test")))
+            .set("tags", listOf(BoardDto.Tag(1L, "tag")))
+            .sample()
+        val fields = ConstrainedFields(BoardDto::class.java)
+
+        context("정상적인 요청인 경우") {
+            every { boardService.getBoard(any()) } returns board
+
+            it("게시물 상세 조회 결과 반환") {
+                mockMvc.perform(
+                    get("/api/v1/board/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+                    .andExpect(status().isOk)
+                    .andExpect(jsonPath("data.boardId").value(board.boardId))
+                    .andExpect(jsonPath("data.title").value(board.title))
+                    .andExpect(jsonPath("data.content").value(board.content))
+                    .andExpect(jsonPath("data.nickname").value(board.nickname))
+                    .andExpect(jsonPath("data.viewCount").value(board.viewCount))
+                    .andExpect(jsonPath("data.likeCount").value(board.likeCount))
+                    .andExpect(jsonPath("data.isLiked").value(board.isLiked.toString()))
+                    .andExpect(jsonPath("data.isBookmarked").value(board.isBookmarked.toString()))
+                    .andExpect(jsonPath("data.images[0].imageId").value(board.images?.get(0)?.imageId))
+                    .andExpect(jsonPath("data.images[0].imageUrl").value(board.images?.get(0)?.imageUrl))
+                    .andExpect(jsonPath("data.tags[0].tagId").value(board.tags?.get(0)?.tagId))
+                    .andExpect(jsonPath("data.tags[0].name").value(board.tags?.get(0)?.name))
+                    .andDo(
+                        document(
+                            "성공",
+                            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                            resource(
+                                ResourceSnippetParameters.builder()
+                                    .tag("게시물")
+                                    .summary("게시물 상세 조회 API")
+                                    .responseFields(
+                                        fields.withPath("data.boardId").description("게시물 ID"),
+                                        fields.withPath("data.title").description("제목"),
+                                        fields.withPath("data.content").description("내용"),
+                                        fields.withPath("data.nickname").description("닉네임"),
+                                        fields.withPath("data.viewCount").description("조회수"),
+                                        fields.withPath("data.likeCount").description("좋아요 수"),
+                                        fields.withPath("data.isLiked").description("좋아요 여부"),
+                                        fields.withPath("data.isBookmarked").description("북마크 여부"),
+                                        fields.withPath("data.images[0].imageId").description("이미지 ID"),
+                                        fields.withPath("data.images[0].imageUrl").description("이미지 URL"),
+                                        fields.withPath("data.tags[0].tagId").description("태그 ID"),
+                                        fields.withPath("data.tags[0].name").description("태그 이름"),
+                                        fields.withPath("status").description("상태"),
+                                        fields.withPath("statusCode").description("상태 코드"),
+                                        fields.withPath("timestamp").description("응답 시간"),
+                                    )
+                                    .build()
+                            )
+                        )
+                    )
+            }
+        }
+
+        context("게시물이 존재하지 않는 경우") {
+            every { boardService.getBoard(any()) } throws CustomException(BoardErrorCode.BOARD_NOT_FOUND)
+
+            it("에러 코드 반환") {
+                mockMvc.perform(
+                    get("/api/v1/board/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+                    .andExpect(status().isNotFound)
+                    .andExpect(jsonPath("message").value(BoardErrorCode.BOARD_NOT_FOUND.message))
+                    .andDo(
+                        document(
+                            "실패 - 게시물이 존재하지 않는 경우",
+                            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                            resource(
+                                ResourceSnippetParameters.builder()
+                                    .tag("게시물")
+                                    .summary("게시물 상세 조회 API")
                                     .build()
                             )
                         )

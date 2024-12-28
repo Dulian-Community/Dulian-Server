@@ -7,6 +7,7 @@ import dulian.dulian.domain.file.entity.AtchFile
 import dulian.dulian.global.config.db.entity.BaseEntity
 import jakarta.persistence.*
 import org.hibernate.annotations.Comment
+import org.hibernate.annotations.SQLRestriction
 
 @Entity
 @Table(
@@ -16,6 +17,7 @@ import org.hibernate.annotations.Comment
     ]
 )
 @Comment("게시물 정보")
+@SQLRestriction("use_flag <> 'N'")
 class Board(
 
     @Id
@@ -32,6 +34,10 @@ class Board(
     @Comment("내용")
     val content: String,
 
+    @Column(name = "view_count", nullable = false)
+    @Comment("조회수")
+    val viewCount: Long,
+
     @Column(name = "board_type", nullable = false, updatable = false, columnDefinition = "VARCHAR(20)")
     @Enumerated(EnumType.STRING)
     @Comment("게시판 타입")
@@ -46,6 +52,9 @@ class Board(
     @JoinColumn(name = "atch_file_id", nullable = true, foreignKey = ForeignKey(ConstraintMode.NO_CONSTRAINT))
     @Comment("첨부파일 정보 IDX")
     val atchFile: AtchFile? = null,
+
+    @OneToMany(mappedBy = "board", fetch = FetchType.LAZY)
+    val tags: List<Tag>? = null
 ) : BaseEntity() {
 
     companion object {
@@ -58,7 +67,8 @@ class Board(
             content = request.content,
             boardType = BoardType.GENERAL,
             member = member,
-            atchFile = atchFile
+            atchFile = atchFile,
+            viewCount = 0
         )
     }
 }

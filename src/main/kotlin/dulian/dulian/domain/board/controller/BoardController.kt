@@ -1,5 +1,6 @@
 package dulian.dulian.domain.board.controller
 
+import dulian.dulian.domain.board.dto.BoardDto
 import dulian.dulian.domain.board.dto.GeneralBoardAddDto
 import dulian.dulian.domain.board.service.BoardService
 import dulian.dulian.domain.file.dto.S3FileDto
@@ -42,5 +43,15 @@ class BoardController(
         val s3FileDto = fileService.uploadAtchFile(image, S3Folder.GENERAL_BOARD)
 
         return ApiResponse.success(s3FileDto)
+    }
+
+    /**
+     * 게시물 상세 조회 API
+     */
+    @GetMapping("/{boardId}")
+    fun getBoard(
+        @PathVariable("boardId") boardId: Long
+    ): ResponseEntity<ApiResponse<BoardDto>> {
+        return ApiResponse.success(boardService.getBoard(boardId))
     }
 }

@@ -3,11 +3,13 @@ package dulian.dulian.domain.file.entity
 import dulian.dulian.global.config.db.entity.BaseEntity
 import jakarta.persistence.*
 import org.hibernate.annotations.Comment
+import org.hibernate.annotations.SQLRestriction
 import org.springframework.web.multipart.MultipartFile
 
 @Entity
 @Table(indexes = [Index(name = "idx_atch_file_detail_atch_file_id", columnList = "atch_file_id")])
 @Comment("첨부파일 상세 정보")
+@SQLRestriction("use_flag <> 'N'")
 class AtchFileDetail(
 
     @Id

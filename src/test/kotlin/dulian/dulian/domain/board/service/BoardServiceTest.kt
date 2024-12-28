@@ -5,7 +5,9 @@ import com.navercorp.fixturemonkey.jakarta.validation.plugin.JakartaValidationPl
 import com.navercorp.fixturemonkey.kotlin.KotlinPlugin
 import dulian.dulian.domain.auth.entity.Member
 import dulian.dulian.domain.auth.repository.MemberRepository
+import dulian.dulian.domain.board.dto.BoardDto
 import dulian.dulian.domain.board.dto.GeneralBoardAddDto
+import dulian.dulian.domain.board.exception.BoardErrorCode
 import dulian.dulian.domain.board.repository.BoardRepository
 import dulian.dulian.domain.board.repository.TagRepository
 import dulian.dulian.domain.file.entity.AtchFile
@@ -30,7 +32,14 @@ class BoardServiceTest : BehaviorSpec({
     val tagRepository: TagRepository = mockk()
 
     val boardService =
-        BoardService(boardRepository, memberRepository, atchFileRepository, atchFileDetailRepository, tagRepository)
+        BoardService(
+            boardRepository,
+            memberRepository,
+            atchFileRepository,
+            atchFileDetailRepository,
+            tagRepository,
+            "s3Url"
+        )
 
     val fixtureMonkey = FixtureMonkey.builder()
         .plugin(KotlinPlugin())
@@ -103,6 +112,41 @@ class BoardServiceTest : BehaviorSpec({
                     verify { atchFileRepository.save(any()) }
                     verify { tagRepository.save(any()) }
                     verify { atchFileDetailRepository.updateAtchFileDetails(any(), any()) }
+                }
+            }
+        }
+    }
+
+    Context("게시물 상세 조회") {
+        val boardId = 1L
+        val board = fixtureMonkey.giveMeOne(BoardDto::class.java)
+
+        Given("게시물이 존재하지 않는 경우") {
+            every { boardRepository.getBoard(any()) } returns null
+
+            When("게시물 상세 조회 시") {
+                val exception = shouldThrow<CustomException> { boardService.getBoard(boardId) }
+
+                Then("exception") {
+                    exception shouldBe CustomException(BoardErrorCode.BOARD_NOT_FOUND)
+
+                    verify { boardRepository.getBoard(any()) }
+                }
+            }
+        }
+
+        Given("정상적인 요청인 경우") {
+            every { boardRepository.getBoard(any()) } returns board
+            every { boardRepository.increaseViewCount(any()) } just Runs
+
+            When("게시물 상세 조회 시") {
+                val result = boardService.getBoard(boardId)
+
+                Then("exception") {
+                    result shouldBe board
+
+                    verify { boardRepository.getBoard(any()) }
+                    verify { boardRepository.increaseViewCount(any()) }
                 }
             }
         }

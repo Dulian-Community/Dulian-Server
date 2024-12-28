@@ -3,6 +3,7 @@ package dulian.dulian.domain.board.entity
 import dulian.dulian.global.config.db.entity.BaseEntity
 import jakarta.persistence.*
 import org.hibernate.annotations.Comment
+import org.hibernate.annotations.SQLRestriction
 
 @Entity
 @Comment("태그 정보")
@@ -11,6 +12,7 @@ import org.hibernate.annotations.Comment
         Index(name = "idx_tag_board_id", columnList = "board_id")
     ]
 )
+@SQLRestriction("use_flag <> 'N'")
 class Tag(
 
     @Id

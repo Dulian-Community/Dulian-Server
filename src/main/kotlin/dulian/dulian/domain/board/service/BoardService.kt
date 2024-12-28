@@ -1,9 +1,11 @@
 package dulian.dulian.domain.board.service
 
 import dulian.dulian.domain.auth.repository.MemberRepository
+import dulian.dulian.domain.board.dto.BoardDto
 import dulian.dulian.domain.board.dto.GeneralBoardAddDto
 import dulian.dulian.domain.board.entity.Board
 import dulian.dulian.domain.board.entity.Tag
+import dulian.dulian.domain.board.exception.BoardErrorCode
 import dulian.dulian.domain.board.repository.BoardRepository
 import dulian.dulian.domain.board.repository.TagRepository
 import dulian.dulian.domain.file.entity.AtchFile
@@ -12,6 +14,7 @@ import dulian.dulian.domain.file.repository.AtchFileRepository
 import dulian.dulian.global.exception.CommonErrorCode
 import dulian.dulian.global.exception.CustomException
 import dulian.dulian.global.utils.SecurityUtils
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -21,7 +24,9 @@ class BoardService(
     private val memberRepository: MemberRepository,
     private val atchFileRepository: AtchFileRepository,
     private val atchFileDetailRepository: AtchFileDetailRepository,
-    private val tagRepository: TagRepository
+    private val tagRepository: TagRepository,
+    @Value("\${cloud.aws.s3.url}")
+    private val s3Url: String
 ) {
 
     @Transactional
@@ -43,6 +48,24 @@ class BoardService(
         request.tags.forEach {
             tagRepository.save(Tag.of(it, board))
         }
+    }
+
+    @Transactional
+    fun getBoard(
+        boardId: Long
+    ): BoardDto {
+        // 게시물 조회
+        val board = boardRepository.getBoard(boardId)
+            ?: throw CustomException(BoardErrorCode.BOARD_NOT_FOUND)
+
+        // 이미지 URL 설정
+        board.initImageUrls(s3Url)
+
+        // 조회수 증가
+        // TODO : 동시성 제어 및 중복 조회수 증가 해결
+        boardRepository.increaseViewCount(boardId)
+
+        return board
     }
 
     private fun saveImage(
