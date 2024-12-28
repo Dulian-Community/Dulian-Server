@@ -9,6 +9,7 @@ import dulian.dulian.global.auth.oauth2.handler.OAuth2LoginSuccessHandler
 import dulian.dulian.global.auth.oauth2.service.CustomOAuth2UserService
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.HttpMethod
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
@@ -62,6 +63,7 @@ class SecurityConfig(
             .authorizeHttpRequests {
                 it
                     .requestMatchers(*PERMIT_ALL).permitAll()
+                    .requestMatchers(HttpMethod.GET, *GET_PERMIT_ALL).permitAll()
                     .anyRequest().authenticated()
             }
 
@@ -103,6 +105,10 @@ class SecurityConfig(
             "/docs/openapi3.yaml",
             "/docs/swagger",
             "/v3/api-docs/**"
+        )
+
+        private val GET_PERMIT_ALL = arrayOf(
+            "/api/v1/board/{board-id}"
         )
     }
 }
