@@ -11,7 +11,7 @@ import dulian.dulian.domain.board.entity.QBoard.board
 import dulian.dulian.domain.board.entity.QTag.tag
 import dulian.dulian.domain.file.entity.QAtchFile.atchFile
 import dulian.dulian.domain.file.entity.QAtchFileDetail.atchFileDetail
-import dulian.dulian.global.config.db.enums.UseFlag
+import dulian.dulian.global.config.db.enums.YNFlag
 import org.springframework.dao.IncorrectResultSizeDataAccessException
 
 class BoardRepositoryCustomImpl(
@@ -39,8 +39,8 @@ class BoardRepositoryCustomImpl(
                             board.member.nickname,
                             board.viewCount,
                             Expressions.constant(9999L), // TODO : 종아요 수
-                            Expressions.constant(UseFlag.Y), // TODO : 좋아요 여부
-                            Expressions.constant(UseFlag.N), // TODO : 북마크 여부
+                            Expressions.constant(YNFlag.Y), // TODO : 좋아요 여부
+                            Expressions.constant(YNFlag.N), // TODO : 북마크 여부
                             list(
                                 Projections.constructor(
                                     BoardDto.AtchFileDetailsDto::class.java,

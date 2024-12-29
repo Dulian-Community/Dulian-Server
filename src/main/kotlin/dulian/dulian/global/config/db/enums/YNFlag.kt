@@ -1,5 +1,5 @@
 package dulian.dulian.global.config.db.enums
 
-enum class UseFlag {
+enum class YNFlag {
     Y, N
 }

@@ -1,7 +1,8 @@
 package dulian.dulian.global.config.db.entity
 
-import dulian.dulian.global.config.db.enums.UseFlag
-import jakarta.persistence.*
+import jakarta.persistence.Column
+import jakarta.persistence.EntityListeners
+import jakarta.persistence.MappedSuperclass
 import org.hibernate.annotations.ColumnDefault
 import org.hibernate.annotations.Comment
 import org.springframework.data.annotation.CreatedBy
@@ -41,10 +42,13 @@ abstract class BaseEntity {
     lateinit var updatedBy: String
         protected set
 
-    @Column(name = "use_flag", nullable = false, insertable = false, length = 1)
-    @Enumerated(EnumType.STRING)
-    @Comment("사용여부")
-    @ColumnDefault("'Y'")
-    lateinit var useFlag: UseFlag
+    @Column(name = "deleted_at", insertable = false, updatable = false, columnDefinition = "DATETIME")
+    @Comment("삭제일자")
+    lateinit var deletedAt: LocalDateTime
+        protected set
+
+    @Column(name = "deleted_by", insertable = false, updatable = false, length = 50)
+    @Comment("삭제자")
+    lateinit var deletedBy: String
         protected set
 }

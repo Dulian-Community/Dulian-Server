@@ -2,7 +2,8 @@ package dulian.dulian.domain.board.repository
 
 import com.querydsl.jpa.impl.JPAQueryFactory
 import dulian.dulian.domain.board.entity.QTag.tag
-import dulian.dulian.global.config.db.enums.UseFlag
+import dulian.dulian.global.utils.SecurityUtils
+import java.time.LocalDateTime
 
 class TagRepositoryCustomImpl(
     private val queryFactory: JPAQueryFactory
@@ -10,7 +11,8 @@ class TagRepositoryCustomImpl(
 
     override fun deleteTagByTagIds(tagIds: List<Long>) {
         queryFactory.update(tag)
-            .set(tag.useFlag, UseFlag.N)
+            .set(tag.deletedAt, LocalDateTime.now())
+            .set(tag.deletedBy, SecurityUtils.getCurrentUserId())
             .where(tag.tagId.`in`(tagIds))
             .execute()
     }

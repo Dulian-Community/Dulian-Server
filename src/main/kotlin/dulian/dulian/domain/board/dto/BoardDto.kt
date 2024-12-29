@@ -1,7 +1,7 @@
 package dulian.dulian.domain.board.dto
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import dulian.dulian.global.config.db.enums.UseFlag
+import dulian.dulian.global.config.db.enums.YNFlag
 
 data class BoardDto(
     val boardId: Long,
@@ -10,8 +10,8 @@ data class BoardDto(
     val nickname: String,
     val viewCount: Long,
     val likeCount: Long,
-    val isLiked: UseFlag,
-    val isBookmarked: UseFlag,
+    val isLiked: YNFlag,
+    val isBookmarked: YNFlag,
     var images: List<AtchFileDetailsDto>?,
     var tags: List<Tag>?
 ) {

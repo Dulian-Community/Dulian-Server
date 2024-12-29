@@ -19,6 +19,6 @@ object SecurityUtils {
             }
         }
 
-        return ""
+        return "SYSTEM"
     }
 }

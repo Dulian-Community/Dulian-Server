@@ -7,6 +7,7 @@ import dulian.dulian.domain.file.entity.AtchFile
 import dulian.dulian.global.config.db.entity.BaseEntity
 import jakarta.persistence.*
 import org.hibernate.annotations.Comment
+import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.SQLRestriction
 
 @Entity
@@ -17,7 +18,8 @@ import org.hibernate.annotations.SQLRestriction
     ]
 )
 @Comment("게시물 정보")
-@SQLRestriction("use_flag <> 'N'")
+@SQLRestriction("deleted_at is null")
+@SQLDelete(sql = "update board set #deleted_at = now() WHERE board_id = ?")
 class Board(
 
     @Id

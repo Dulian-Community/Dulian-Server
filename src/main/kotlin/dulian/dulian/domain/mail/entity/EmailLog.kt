@@ -1,7 +1,7 @@
 package dulian.dulian.domain.mail.entity
 
 import dulian.dulian.domain.mail.enums.EmailTemplateCode
-import dulian.dulian.global.config.db.enums.UseFlag
+import dulian.dulian.global.config.db.enums.YNFlag
 import dulian.dulian.global.utils.ClientUtils
 import jakarta.persistence.*
 import org.hibernate.annotations.ColumnDefault
@@ -24,7 +24,7 @@ class EmailLog(
     @Column(name = "success_flag", length = 1, nullable = false, columnDefinition = "VARCHAR(1)")
     @Enumerated(EnumType.STRING)
     @Comment("이메일 전송 성공 여부(Y/N)")
-    val successFlag: UseFlag,
+    val successFlag: YNFlag,
 
     @Column(
         name = "email_template_code",
@@ -61,7 +61,7 @@ class EmailLog(
             email: String,
             emailTemplateCode: EmailTemplateCode
         ) = EmailLog(
-            successFlag = UseFlag.N,
+            successFlag = YNFlag.N,
             emailTemplateCode = emailTemplateCode,
             email = email,
             accessIp = ClientUtils.getClientIp()
@@ -74,7 +74,7 @@ class EmailLog(
             email: String,
             emailTemplateCode: EmailTemplateCode
         ) = EmailLog(
-            successFlag = UseFlag.Y,
+            successFlag = YNFlag.Y,
             emailTemplateCode = emailTemplateCode,
             email = email,
             accessIp = ClientUtils.getClientIp()
