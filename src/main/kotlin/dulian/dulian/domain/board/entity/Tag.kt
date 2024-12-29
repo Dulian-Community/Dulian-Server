@@ -13,7 +13,7 @@ import org.hibernate.annotations.SQLRestriction
         Index(name = "idx_tag_board_id", columnList = "board_id")
     ]
 )
-@SQLRestriction("deleted_at is not null")
+@SQLRestriction("deleted_at is null")
 @SQLDelete(sql = "update tag set #deleted_at = now() WHERE tag_id = ?")
 class Tag(
 

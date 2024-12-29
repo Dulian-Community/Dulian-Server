@@ -46,11 +46,6 @@ class AtchFileDetail(
     var atchFile: AtchFile? = null
 ) : BaseEntity() {
 
-    fun changeAtchFile(atchFile: AtchFile) {
-        this.atchFile = atchFile
-        atchFile.atchFileDetails.add(this)
-    }
-
     companion object {
         fun of(
             file: MultipartFile,

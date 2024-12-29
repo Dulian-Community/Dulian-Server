@@ -17,6 +17,7 @@ import dulian.dulian.global.exception.CustomException
 import dulian.dulian.global.utils.SecurityUtils
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -148,6 +149,26 @@ class BoardService(
             content = request.content
         )
         boardRepository.save(board)
+    }
+
+    @Transactional
+    fun removeBoard(
+        boardId: Long
+    ) {
+        // 게시물 조회
+        val board = boardRepository.findByIdOrNull(boardId)
+            ?: throw CustomException(BoardErrorCode.BOARD_NOT_FOUND)
+
+        // 본인의 게시물인지 검증
+        val memberId = board.member.memberId!!
+        val member = memberRepository.findByUserId(SecurityUtils.getCurrentUserId())
+            ?: throw CustomException(CommonErrorCode.UNAUTHORIZED)
+        if (memberId != member.memberId) {
+            throw CustomException(BoardErrorCode.BOARD_NOT_FOUND)
+        }
+
+        // 게시물 삭제
+        boardRepository.delete(board)
     }
 
     private fun saveImage(

@@ -9,7 +9,7 @@ class CustomStatementInspector : StatementInspector {
         if (sql!!.contains(DELETE_QUERY)) {
             return sql.replace(
                 DELETE_QUERY,
-                DELETE_AFTER_QUERY + SecurityUtils.getCurrentUserId()
+                DELETE_AFTER_QUERY + "'${SecurityUtils.getCurrentUserId()}'"
             )
         }
         return sql

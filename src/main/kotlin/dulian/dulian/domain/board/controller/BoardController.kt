@@ -70,4 +70,16 @@ class BoardController(
 
         return ApiResponse.success()
     }
+
+    /**
+     * 게시물 삭제 API
+     */
+    @DeleteMapping("/{boardId}")
+    fun deleteBoard(
+        @PathVariable("boardId") boardId: Long
+    ): ResponseEntity<ApiResponse<Unit>> {
+        boardService.removeBoard(boardId)
+
+        return ApiResponse.success()
+    }
 }

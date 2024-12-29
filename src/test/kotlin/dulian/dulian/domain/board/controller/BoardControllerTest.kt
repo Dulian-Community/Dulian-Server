@@ -32,6 +32,8 @@ import org.springframework.restdocs.RestDocumentationExtension
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation
 import org.springframework.restdocs.operation.preprocess.Preprocessors
 import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
+import org.springframework.restdocs.request.RequestDocumentation.parameterWithName
+import org.springframework.restdocs.request.RequestDocumentation.pathParameters
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
@@ -229,7 +231,7 @@ class BoardControllerTest(
 
             it("게시물 상세 조회 결과 반환") {
                 mockMvc.perform(
-                    get("/api/v1/board/1")
+                    get("/api/v1/board/{boardId}", 1L)
                         .contentType(MediaType.APPLICATION_JSON)
                 )
                     .andExpect(status().isOk)
@@ -250,6 +252,9 @@ class BoardControllerTest(
                             "성공",
                             Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
                             Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                            pathParameters(
+                                parameterWithName("boardId").description("게시물 ID")
+                            ),
                             resource(
                                 ResourceSnippetParameters.builder()
                                     .tag("게시물")
@@ -283,7 +288,7 @@ class BoardControllerTest(
 
             it("에러 코드 반환") {
                 mockMvc.perform(
-                    get("/api/v1/board/1")
+                    get("/api/v1/board/{boardId}", 1L)
                         .contentType(MediaType.APPLICATION_JSON)
                 )
                     .andExpect(status().isNotFound)
@@ -293,6 +298,9 @@ class BoardControllerTest(
                             "실패 - 게시물이 존재하지 않는 경우",
                             Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
                             Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                            pathParameters(
+                                parameterWithName("boardId").description("게시물 ID")
+                            ),
                             resource(
                                 ResourceSnippetParameters.builder()
                                     .tag("게시물")
@@ -424,6 +432,66 @@ class BoardControllerTest(
                                 ResourceSnippetParameters.builder()
                                     .tag("게시물")
                                     .summary("게시물 수정 API")
+                                    .build()
+                            )
+                        )
+                    )
+            }
+        }
+    }
+
+    describe("게시물 삭제 API") {
+        val boardId = 1L
+        context("정상적인 요청인 경우") {
+            every { boardService.removeBoard(any()) } just Runs
+
+            it("성공") {
+                mockMvc.perform(
+                    delete("/api/v1/board/{boardId}", boardId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+                    .andExpect(status().isOk)
+                    .andDo(
+                        document(
+                            "성공 - 정상적인 요청인 경우",
+                            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                            pathParameters(
+                                parameterWithName("boardId").description("게시물 ID")
+                            ),
+                            resource(
+                                ResourceSnippetParameters.builder()
+                                    .tag("게시물")
+                                    .summary("게시물 삭제 API")
+                                    .build()
+                            )
+                        )
+                    )
+            }
+        }
+
+        context("게시물이 존재하지 않거나 본인의 게시물이 아닌 경우") {
+            every { boardService.removeBoard(any()) } throws CustomException(BoardErrorCode.BOARD_NOT_FOUND)
+
+            it("에러 코드 반환") {
+                mockMvc.perform(
+                    delete("/api/v1/board/{boardId}", boardId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+                    .andExpect(status().isNotFound)
+                    .andExpect(jsonPath("message").value(BoardErrorCode.BOARD_NOT_FOUND.message))
+                    .andDo(
+                        document(
+                            "실패 - 게시물이 존재하지 않거나 본인의 게시물이 아닌 경우",
+                            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                            pathParameters(
+                                parameterWithName("boardId").description("게시물 ID")
+                            ),
+                            resource(
+                                ResourceSnippetParameters.builder()
+                                    .tag("게시물")
+                                    .summary("게시물 삭제 API")
                                     .build()
                             )
                         )

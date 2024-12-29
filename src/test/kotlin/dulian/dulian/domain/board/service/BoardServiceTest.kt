@@ -25,6 +25,7 @@ import io.kotest.core.spec.IsolationMode
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.*
+import org.springframework.data.repository.findByIdOrNull
 
 class BoardServiceTest : BehaviorSpec({
     isolationMode = IsolationMode.InstancePerLeaf
@@ -353,6 +354,67 @@ class BoardServiceTest : BehaviorSpec({
                     verify { atchFileDetailRepository.findByAtchFileDetailIdIn(any()) }
                     verify { atchFileRepository.save(any()) }
                     verify { atchFileDetailRepository.updateAtchFileDetails(any(), any()) }
+                }
+            }
+        }
+    }
+
+    Context("게시물 삭제") {
+        val boardId = 1L
+        val member = fixtureMonkey.giveMeBuilder(Member::class.java)
+            .set("memberId", 1L)
+            .sample()
+        val savedBoard = fixtureMonkey.giveMeBuilder(Board::class.java)
+            .set("member", member)
+            .sample()
+
+        Given("게시물이 존재하지 않는 경우") {
+            every { boardRepository.findByIdOrNull(any()) } returns null
+
+            When("게시물 삭제 시") {
+                val exception = shouldThrow<CustomException> { boardService.removeBoard(boardId) }
+
+                Then("exception") {
+                    exception shouldBe CustomException(BoardErrorCode.BOARD_NOT_FOUND)
+
+                    verify { boardRepository.findByIdOrNull(any()) }
+                }
+            }
+        }
+
+        Given("본인의 게시물이 아닌 경우") {
+            val wrongMember = fixtureMonkey.giveMeBuilder(Member::class.java)
+                .set("memberId", 2L)
+                .sample()
+            mockkObject(SecurityUtils)
+            every { boardRepository.findByIdOrNull(any()) } returns savedBoard
+            every { SecurityUtils.getCurrentUserId() } returns "1"
+            every { memberRepository.findByUserId(any()) } returns wrongMember
+
+            When("게시물 삭제 시") {
+                val exception = shouldThrow<CustomException> { boardService.removeBoard(boardId) }
+
+                Then("exception") {
+                    exception shouldBe CustomException(BoardErrorCode.BOARD_NOT_FOUND)
+
+                    verify { boardRepository.findByIdOrNull(any()) }
+                }
+            }
+        }
+
+        Given("정상적인 요청인 경우") {
+            mockkObject(SecurityUtils)
+            every { boardRepository.findByIdOrNull(any()) } returns savedBoard
+            every { SecurityUtils.getCurrentUserId() } returns "1"
+            every { memberRepository.findByUserId(any()) } returns member
+            every { boardRepository.delete(any()) } just Runs
+
+            When("게시물 삭제 시") {
+                boardService.removeBoard(boardId)
+
+                Then("성공") {
+                    verify { boardRepository.findByIdOrNull(any()) }
+                    verify { boardRepository.delete(any()) }
                 }
             }
         }
