@@ -37,6 +37,7 @@ class BoardRepositoryCustomImpl(
                             board.title,
                             board.content,
                             board.member.nickname,
+                            board.member.userId,
                             board.viewCount,
                             Expressions.constant(9999L), // TODO : 종아요 수
                             Expressions.constant(YNFlag.Y), // TODO : 좋아요 여부

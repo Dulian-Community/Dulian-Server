@@ -243,6 +243,7 @@ class BoardControllerTest(
                     .andExpect(jsonPath("data.likeCount").value(board.likeCount))
                     .andExpect(jsonPath("data.isLiked").value(board.isLiked.toString()))
                     .andExpect(jsonPath("data.isBookmarked").value(board.isBookmarked.toString()))
+                    .andExpect(jsonPath("data.isMine").value(board.isMine.toString()))
                     .andExpect(jsonPath("data.images[0].imageId").value(board.images?.get(0)?.imageId))
                     .andExpect(jsonPath("data.images[0].imageUrl").value(board.images?.get(0)?.imageUrl))
                     .andExpect(jsonPath("data.tags[0].tagId").value(board.tags?.get(0)?.tagId))
@@ -268,6 +269,7 @@ class BoardControllerTest(
                                         fields.withPath("data.likeCount").description("좋아요 수"),
                                         fields.withPath("data.isLiked").description("좋아요 여부"),
                                         fields.withPath("data.isBookmarked").description("북마크 여부"),
+                                        fields.withPath("data.isMine").description("본인 게시물 여부"),
                                         fields.withPath("data.images[0].imageId").description("이미지 ID"),
                                         fields.withPath("data.images[0].imageUrl").description("이미지 URL"),
                                         fields.withPath("data.tags[0].tagId").description("태그 ID"),
