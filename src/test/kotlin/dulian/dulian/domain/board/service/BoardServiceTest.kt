@@ -8,6 +8,7 @@ import dulian.dulian.domain.auth.repository.MemberRepository
 import dulian.dulian.domain.board.dto.BoardDto
 import dulian.dulian.domain.board.dto.BoardModifyDto
 import dulian.dulian.domain.board.dto.GeneralBoardAddDto
+import dulian.dulian.domain.board.dto.SearchDto
 import dulian.dulian.domain.board.entity.Board
 import dulian.dulian.domain.board.entity.Tag
 import dulian.dulian.domain.board.exception.BoardErrorCode
@@ -17,6 +18,7 @@ import dulian.dulian.domain.file.entity.AtchFile
 import dulian.dulian.domain.file.entity.AtchFileDetail
 import dulian.dulian.domain.file.repository.AtchFileDetailRepository
 import dulian.dulian.domain.file.repository.AtchFileRepository
+import dulian.dulian.global.common.PageResponseDto
 import dulian.dulian.global.exception.CommonErrorCode
 import dulian.dulian.global.exception.CustomException
 import dulian.dulian.global.utils.SecurityUtils
@@ -415,6 +417,31 @@ class BoardServiceTest : BehaviorSpec({
                 Then("성공") {
                     verify { boardRepository.findByIdOrNull(any()) }
                     verify { boardRepository.delete(any()) }
+                }
+            }
+        }
+    }
+
+    Context("게시물 목록 조회") {
+        val request = fixtureMonkey.giveMeOne(SearchDto.Request::class.java)
+        val boardResponse = fixtureMonkey.giveMeOne(SearchDto.Response::class.java)
+        val pageResponse = PageResponseDto<SearchDto.Response>(
+            result = listOf(boardResponse),
+            totalElements = 1,
+            totalPages = 1,
+            currentPage = 1
+        )
+
+        Given("정상적인 요청인 경우") {
+            every { boardRepository.search(request) } returns pageResponse
+
+            When("목록 조회 시") {
+                val result = boardService.search(request)
+
+                Then("성공") {
+                    result shouldBe pageResponse
+
+                    verify { boardRepository.search(request) }
                 }
             }
         }

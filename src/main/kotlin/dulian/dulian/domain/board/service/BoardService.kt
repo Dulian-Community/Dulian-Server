@@ -4,6 +4,7 @@ import dulian.dulian.domain.auth.repository.MemberRepository
 import dulian.dulian.domain.board.dto.BoardDto
 import dulian.dulian.domain.board.dto.BoardModifyDto
 import dulian.dulian.domain.board.dto.GeneralBoardAddDto
+import dulian.dulian.domain.board.dto.SearchDto
 import dulian.dulian.domain.board.entity.Board
 import dulian.dulian.domain.board.entity.Tag
 import dulian.dulian.domain.board.exception.BoardErrorCode
@@ -12,6 +13,7 @@ import dulian.dulian.domain.board.repository.TagRepository
 import dulian.dulian.domain.file.entity.AtchFile
 import dulian.dulian.domain.file.repository.AtchFileDetailRepository
 import dulian.dulian.domain.file.repository.AtchFileRepository
+import dulian.dulian.global.common.PageResponseDto
 import dulian.dulian.global.exception.CommonErrorCode
 import dulian.dulian.global.exception.CustomException
 import dulian.dulian.global.utils.SecurityUtils
@@ -33,6 +35,13 @@ class BoardService(
 ) {
 
     private val log = KotlinLogging.logger { }
+
+    @Transactional(readOnly = true)
+    fun search(
+        request: SearchDto.Request
+    ): PageResponseDto<SearchDto.Response> {
+        return boardRepository.search(request)
+    }
 
     @Transactional
     fun addBoard(

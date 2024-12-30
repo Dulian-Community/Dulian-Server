@@ -5,15 +5,13 @@ import com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.document
 import com.epages.restdocs.apispec.ResourceDocumentation.resource
 import com.epages.restdocs.apispec.ResourceSnippetParameters
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.navercorp.fixturemonkey.FixtureMonkey
-import com.navercorp.fixturemonkey.jakarta.validation.plugin.JakartaValidationPlugin
-import com.navercorp.fixturemonkey.kotlin.KotlinPlugin
 import com.ninjasquad.springmockk.MockkBean
 import dulian.dulian.domain.auth.dto.FindIdDto
 import dulian.dulian.domain.auth.dto.FindPasswordDto
 import dulian.dulian.domain.auth.exception.AccountFindErrorCode
 import dulian.dulian.domain.auth.service.AccountFindService
 import dulian.dulian.global.exception.CustomException
+import dulian.dulian.utils.ControllerTestUtils
 import io.kotest.core.spec.style.DescribeSpec
 import io.mockk.Runs
 import io.mockk.every
@@ -25,16 +23,11 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.http.MediaType
 import org.springframework.restdocs.ManualRestDocumentation
 import org.springframework.restdocs.RestDocumentationExtension
-import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation
 import org.springframework.restdocs.operation.preprocess.Preprocessors
 import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
-import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder
-import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
-import org.springframework.web.filter.CharacterEncodingFilter
 
 @WebMvcTest(AccountFindController::class)
 @ExtendWith(RestDocumentationExtension::class)
@@ -49,21 +42,8 @@ class AccountFindControllerTest(
     private val objectMapper: ObjectMapper
 ) : DescribeSpec({
     val restDocumentation = ManualRestDocumentation()
-    val mockMvc = MockMvcBuilders.webAppContextSetup(context)
-        .apply<DefaultMockMvcBuilder>(
-            MockMvcRestDocumentation.documentationConfiguration(restDocumentation)
-                .operationPreprocessors()
-                .withRequestDefaults(Preprocessors.prettyPrint())
-                .withResponseDefaults(Preprocessors.prettyPrint())
-        )
-        .addFilter<DefaultMockMvcBuilder>(CharacterEncodingFilter("UTF-8", true))
-        .alwaysDo<DefaultMockMvcBuilder>(MockMvcResultHandlers.print())
-        .build()
-
-    val fixtureMonkey = FixtureMonkey.builder()
-        .plugin(KotlinPlugin())
-        .plugin(JakartaValidationPlugin())
-        .build()
+    val mockMvc = ControllerTestUtils.initMockMvc(context, restDocumentation)
+    val fixtureMonkey = ControllerTestUtils.fixtureMonkey()
 
     beforeEach { restDocumentation.beforeTest(javaClass, it.name.testName) }
     afterEach { restDocumentation.afterTest() }

@@ -12,11 +12,13 @@ import com.ninjasquad.springmockk.MockkBean
 import dulian.dulian.domain.board.dto.BoardDto
 import dulian.dulian.domain.board.dto.BoardModifyDto
 import dulian.dulian.domain.board.dto.GeneralBoardAddDto
+import dulian.dulian.domain.board.dto.SearchDto
 import dulian.dulian.domain.board.exception.BoardErrorCode
 import dulian.dulian.domain.board.service.BoardService
 import dulian.dulian.domain.file.dto.S3FileDto
 import dulian.dulian.domain.file.exception.FileErrorCode
 import dulian.dulian.domain.file.service.FileService
+import dulian.dulian.global.common.PageResponseDto
 import dulian.dulian.global.exception.CustomException
 import io.kotest.core.spec.style.DescribeSpec
 import io.mockk.Runs
@@ -32,8 +34,8 @@ import org.springframework.restdocs.RestDocumentationExtension
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation
 import org.springframework.restdocs.operation.preprocess.Preprocessors
 import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
-import org.springframework.restdocs.request.RequestDocumentation.parameterWithName
-import org.springframework.restdocs.request.RequestDocumentation.pathParameters
+import org.springframework.restdocs.payload.PayloadDocumentation.responseFields
+import org.springframework.restdocs.request.RequestDocumentation.*
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
@@ -494,6 +496,98 @@ class BoardControllerTest(
                                 ResourceSnippetParameters.builder()
                                     .tag("게시물")
                                     .summary("게시물 삭제 API")
+                                    .build()
+                            )
+                        )
+                    )
+            }
+        }
+    }
+
+    describe("게시물 목록 조회 API") {
+        val request = SearchDto.Request(
+            page = 1,
+            query = "검색어",
+            condition = "ALL",
+            order = "VIEW",
+            startDate = "2025-01-01",
+            endDate = "2025-12-31",
+            isMarked = "Y"
+        )
+        val response = fixtureMonkey.giveMeOne(SearchDto.Response::class.java)
+        response.tags = listOf("tag1", "tag2")
+        val pageResponse = PageResponseDto<SearchDto.Response>(
+            result = listOf(response),
+            totalElements = 1,
+            totalPages = 1,
+            currentPage = 1,
+            pageSize = 10
+        )
+        context("정상적인 요청인 경우") {
+            every { boardService.search(request) } returns pageResponse
+
+            it("게시물 목록 반환") {
+                mockMvc.perform(
+                    get("/api/v1/board/search")
+                        .param("page", "1")
+                        .param("query", "검색어")
+                        .param("condition", "ALL")
+                        .param("order", "VIEW")
+                        .param("startDate", "2025-01-01")
+                        .param("endDate", "2025-12-31")
+                        .param("isMarked", "Y")
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+                    .andExpect(status().isOk)
+                    .andExpect(jsonPath("data.result[0].boardId").value(response.boardId))
+                    .andExpect(jsonPath("data.result[0].nickname").value(response.nickname))
+                    .andExpect(jsonPath("data.result[0].title").value(response.title))
+                    .andExpect(jsonPath("data.result[0].content").value(response.content))
+                    .andExpect(jsonPath("data.result[0].viewCount").value(response.viewCount))
+                    .andExpect(jsonPath("data.result[0].createdAt").value(response.createdAt.toString()))
+                    .andExpect(jsonPath("data.result[0].isMarked").value(response.isMarked.toString()))
+                    .andExpect(jsonPath("data.result[0].likeCount").value(response.likeCount))
+                    .andExpect(jsonPath("data.result[0].tags[0]").value(response.tags[0]))
+                    .andExpect(jsonPath("data.totalElements").value(pageResponse.totalElements))
+                    .andExpect(jsonPath("data.totalPages").value(pageResponse.totalPages))
+                    .andExpect(jsonPath("data.currentPage").value(pageResponse.currentPage))
+                    .andExpect(jsonPath("data.pageSize").value(pageResponse.pageSize))
+                    .andDo(
+                        document(
+                            "성공",
+                            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                            queryParameters(
+                                parameterWithName("page").description("페이지 번호"),
+                                parameterWithName("query").description("검색어"),
+                                parameterWithName("condition").description("검색 조건(ALL, TITLE, CONTENT, NICKNAME)"),
+                                parameterWithName("order").description("정렬 조건(LATEST, POPULAR, COMMENT, VIEW)"),
+                                parameterWithName("startDate").description("시작 날짜(YYYY-MM-DD)"),
+                                parameterWithName("endDate").description("종료 날짜(YYYY-MM-DD)"),
+                                parameterWithName("isMarked").description("북마크 여부(Y, N)")
+                            ),
+                            responseFields(
+                                fieldWithPath("data.result[0].boardId").description("게시물 ID"),
+                                fieldWithPath("data.result[0].nickname").description("닉네임"),
+                                fieldWithPath("data.result[0].title").description("제목"),
+                                fieldWithPath("data.result[0].content").description("내용"),
+                                fieldWithPath("data.result[0].viewCount").description("조회수"),
+                                fieldWithPath("data.result[0].createdAt").description("작성일"),
+                                fieldWithPath("data.result[0].isMarked").description("북마크 여부"),
+                                fieldWithPath("data.result[0].likeCount").description("좋아요 수"),
+                                fieldWithPath("data.result[0].tags[0]").description("태그"),
+                                fieldWithPath("data.totalElements").description("총 게시물 수"),
+                                fieldWithPath("data.totalPages").description("총 페이지 수"),
+                                fieldWithPath("data.currentPage").description("현재 페이지"),
+                                fieldWithPath("data.pageSize").description("페이지 크기"),
+                                fieldWithPath("status").description("상태"),
+                                fieldWithPath("statusCode").description("상태 코드"),
+                                fieldWithPath("timestamp").description("응답 시간"),
+                            ),
+                            resource(
+                                ResourceSnippetParameters.builder()
+                                    .tag("게시물")
+                                    .summary("게시물 목록 조회 API")
                                     .build()
                             )
                         )

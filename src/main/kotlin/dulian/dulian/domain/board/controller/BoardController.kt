@@ -3,11 +3,13 @@ package dulian.dulian.domain.board.controller
 import dulian.dulian.domain.board.dto.BoardDto
 import dulian.dulian.domain.board.dto.BoardModifyDto
 import dulian.dulian.domain.board.dto.GeneralBoardAddDto
+import dulian.dulian.domain.board.dto.SearchDto
 import dulian.dulian.domain.board.service.BoardService
 import dulian.dulian.domain.file.dto.S3FileDto
 import dulian.dulian.domain.file.enums.S3Folder
 import dulian.dulian.domain.file.service.FileService
 import dulian.dulian.global.common.ApiResponse
+import dulian.dulian.global.common.PageResponseDto
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -19,6 +21,17 @@ class BoardController(
     private val boardService: BoardService,
     private val fileService: FileService
 ) {
+
+    /**
+     * 게시물 목록 조회 API
+     */
+    @GetMapping("/search")
+    fun searchBoard(
+        @ModelAttribute request: SearchDto.Request
+    ): ResponseEntity<ApiResponse<PageResponseDto<SearchDto.Response>>> {
+        return ApiResponse.success(boardService.search(request))
+    }
+
     /**
      * 게시물 등록 API
      */
