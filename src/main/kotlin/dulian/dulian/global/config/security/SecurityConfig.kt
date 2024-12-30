@@ -101,6 +101,7 @@ class SecurityConfig(
             "/api/v1/auth/refresh",
             "/api/v1/auth/find-id/**",
             "/api/v1/auth/reset-password",
+            "/api/v1/board/search",
             "/docs/swagger-ui/**",
             "/docs/openapi3.yaml",
             "/docs/swagger",
