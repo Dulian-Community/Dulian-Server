@@ -3,6 +3,7 @@ package dulian.dulian.domain.board.dto
 import com.fasterxml.jackson.annotation.JsonIgnore
 import dulian.dulian.global.config.db.enums.YNFlag
 import dulian.dulian.global.utils.SecurityUtils
+import java.time.LocalDateTime
 
 data class BoardDto(
     val boardId: Long,
@@ -12,6 +13,7 @@ data class BoardDto(
     @JsonIgnore
     val memberId: Long,
     val viewCount: Long,
+    val createdAt: LocalDateTime,
     var images: List<AtchFileDetailsDto>?,
     var tags: List<Tag>?,
     val likeCount: Long,

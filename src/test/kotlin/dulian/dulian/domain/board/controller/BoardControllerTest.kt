@@ -268,6 +268,7 @@ class BoardControllerTest(
                                         fields.withPath("data.isLiked").description("좋아요 여부"),
                                         fields.withPath("data.isMarked").description("북마크 여부"),
                                         fields.withPath("data.isMine").description("본인 게시물 여부"),
+                                        fields.withPath("data.createdAt").description("작성일"),
                                         fields.withPath("data.images[0].imageId").description("이미지 ID"),
                                         fields.withPath("data.images[0].imageUrl").description("이미지 URL"),
                                         fields.withPath("data.tags[0].tagId").description("태그 ID"),

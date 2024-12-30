@@ -51,6 +51,7 @@ class BoardRepositoryCustomImpl(
                             board.member.nickname,
                             board.member.memberId,
                             board.viewCount,
+                            board.createdAt,
                             list(
                                 Projections.constructor(
                                     BoardDto.AtchFileDetailsDto::class.java,
