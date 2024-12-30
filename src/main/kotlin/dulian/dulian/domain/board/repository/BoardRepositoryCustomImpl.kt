@@ -3,14 +3,17 @@ package dulian.dulian.domain.board.repository
 import com.querydsl.core.BooleanBuilder
 import com.querydsl.core.group.GroupBy.groupBy
 import com.querydsl.core.group.GroupBy.list
+import com.querydsl.core.types.Expression
 import com.querydsl.core.types.OrderSpecifier
 import com.querydsl.core.types.Projections
 import com.querydsl.core.types.dsl.Expressions
+import com.querydsl.jpa.JPAExpressions
 import com.querydsl.jpa.impl.JPAQueryFactory
 import dulian.dulian.domain.auth.entity.QMember.member
 import dulian.dulian.domain.board.dto.BoardDto
 import dulian.dulian.domain.board.dto.SearchDto
 import dulian.dulian.domain.board.entity.QBoard.board
+import dulian.dulian.domain.board.entity.QBoardLike.boardLike
 import dulian.dulian.domain.board.entity.QTag.tag
 import dulian.dulian.domain.board.enums.SearchCondition
 import dulian.dulian.domain.board.enums.SearchOrder
@@ -18,12 +21,27 @@ import dulian.dulian.domain.file.entity.QAtchFile.atchFile
 import dulian.dulian.domain.file.entity.QAtchFileDetail.atchFileDetail
 import dulian.dulian.global.common.PageResponseDto
 import dulian.dulian.global.config.db.enums.YNFlag
+import dulian.dulian.global.utils.SecurityUtils
 import org.springframework.dao.IncorrectResultSizeDataAccessException
 import kotlin.math.ceil
 
 class BoardRepositoryCustomImpl(
     private val queryFactory: JPAQueryFactory
 ) : BoardRepositoryCustom {
+
+    private fun a(): Expression<out Any> {
+        println(SecurityUtils.getCurrentUserId())
+        return if (SecurityUtils.isAuthorized()) {
+            JPAExpressions.select(boardLike.count())
+                .from(boardLike)
+                .where(
+                    boardLike.board.eq(board)
+//                        .and(boardLike.member.userId.eq(SecurityUtils.getCurrentUserId()))
+                )
+        } else {
+            Expressions.constant(0)
+        }
+    }
 
     override fun getBoard(boardId: Long): BoardDto? {
         val result = queryFactory.select(
@@ -44,10 +62,13 @@ class BoardRepositoryCustomImpl(
                             board.title,
                             board.content,
                             board.member.nickname,
-                            board.member.userId,
+                            board.member.memberId,
                             board.viewCount,
-                            Expressions.constant(9999L), // TODO : 종아요 수
-                            Expressions.constant(YNFlag.Y), // TODO : 좋아요 여부
+                            JPAExpressions.select(boardLike.count())
+                                .from(boardLike)
+                                .where(boardLike.board.eq(board)),
+                            a(),
+//                            Expressions.constant(YNFlag.Y), // TODO : 좋아요 여부
                             Expressions.constant(YNFlag.N), // TODO : 북마크 여부
                             list(
                                 Projections.constructor(
@@ -137,7 +158,9 @@ class BoardRepositoryCustomImpl(
         val searchQuery = queryFactory.select(board)
             .from(board)
             .innerJoin(board.member, member)
+            .leftJoin(boardLike).on(boardLike.board.boardId.eq(board.boardId))
             .where(createSearchConditions(request))
+            .groupBy(board.boardId, board.viewCount, board.createdAt)
             .limit(10)
             .offset(request.firstIndex)
 
@@ -159,7 +182,7 @@ class BoardRepositoryCustomImpl(
                         board.viewCount,
                         board.createdAt,
                         Expressions.constant(YNFlag.N), // TODO : 북마크 여부
-                        Expressions.constant(9999L), // TODO : 종아요 수
+                        boardLike.count()
                     )
                 )
         )
@@ -239,7 +262,11 @@ class BoardRepositoryCustomImpl(
                 orderSpecifiers.add(board.createdAt.desc())
             }
 
-            SearchOrder.POPULAR -> null // TODO : 좋아요순 정렬
+            SearchOrder.POPULAR -> {
+                orderSpecifiers.add(boardLike.count().desc())
+                orderSpecifiers.add(board.createdAt.desc())
+            }
+
             SearchOrder.COMMENT -> null // TODO : 댓글순 정렬
         }
 

@@ -10,16 +10,16 @@ data class BoardDto(
     val content: String,
     val nickname: String,
     @JsonIgnore
-    val userId: String,
+    val memberId: Long,
     val viewCount: Long,
     val likeCount: Long,
-    val isLiked: YNFlag,
+    val isLiked: Long,
     val isBookmarked: YNFlag,
     var images: List<AtchFileDetailsDto>?,
     var tags: List<Tag>?
 ) {
     val isMine: YNFlag
-        get() = if (this.userId == SecurityUtils.getCurrentUserId()) YNFlag.Y else YNFlag.N
+        get() = if (this.memberId == SecurityUtils.getCurrentUserId()) YNFlag.Y else YNFlag.N
 
     // 이미지 URL 세팅
     fun initImageUrls(s3Url: String) {

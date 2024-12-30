@@ -49,7 +49,7 @@ class LoginService(
 
         // Authentication 객체 생성
         val authentication = UsernamePasswordAuthenticationToken(
-            savedMember.userId,
+            savedMember.memberId,
             savedMember.password,
             listOf(Role.ROLE_USER).map { SimpleGrantedAuthority(it.name) }
         )
@@ -61,7 +61,7 @@ class LoginService(
         refreshTokenRepository.save(
             RefreshToken.of(
                 token = refreshToken,
-                userId = savedMember.userId
+                memberId = savedMember.memberId!!
             )
         )
 

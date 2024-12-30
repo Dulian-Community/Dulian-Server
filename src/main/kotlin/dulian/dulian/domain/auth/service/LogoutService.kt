@@ -20,6 +20,6 @@ class LogoutService(
         CookieUtils.removeCookie("USER_REFRESH_TOKEN", response)
 
         // DB에서 Refresh Token 삭제
-        refreshTokenRepository.deleteByUserId(SecurityUtils.getCurrentUserId())
+        refreshTokenRepository.deleteByMemberId(SecurityUtils.getCurrentUserId())
     }
 }

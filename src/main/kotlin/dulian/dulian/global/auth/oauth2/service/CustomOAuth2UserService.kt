@@ -35,8 +35,11 @@ class CustomOAuth2UserService(
         val oAuth2UserInfo = OAuth2UserInfoFactory.of(socialType, attributes)
 
         // 이미 가입된 회원인지 확인 후 가입되지 않은 회원이면 저장
-        if (!memberRepository.existsByUserIdAndSocialType(oAuth2UserInfo.getId(), socialType)) {
-            memberRepository.save(Member.ofOAuth2(oAuth2UserInfo, socialType))
+        val savedMember = memberRepository.findByUserIdAndSocialType(oAuth2UserInfo.getId(), socialType)
+        val memberId = if (savedMember == null) {
+            memberRepository.save(Member.ofOAuth2(oAuth2UserInfo, socialType)).memberId!!
+        } else {
+            savedMember.memberId!!
         }
 
         return CustomOAuth2User(
@@ -51,7 +54,7 @@ class CustomOAuth2UserService(
             } else {
                 usernameAttributeName!!
             },
-            userId = oAuth2UserInfo.getId(),
+            userId = memberId.toString()
         )
     }
 }

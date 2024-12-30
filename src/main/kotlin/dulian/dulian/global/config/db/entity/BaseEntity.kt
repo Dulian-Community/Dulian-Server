@@ -24,9 +24,9 @@ abstract class BaseEntity {
         protected set
 
     @CreatedBy
-    @Column(name = "created_by", nullable = false, updatable = false, length = 50)
+    @Column(name = "created_by", nullable = false, updatable = false)
     @Comment("등록자")
-    lateinit var createdBy: String
+    var createdBy: Long = 0
         protected set
 
     @LastModifiedDate
@@ -37,9 +37,9 @@ abstract class BaseEntity {
         protected set
 
     @LastModifiedBy
-    @Column(name = "updated_by", nullable = false, length = 50)
+    @Column(name = "updated_by", nullable = false)
     @Comment("수정자")
-    lateinit var updatedBy: String
+    var updatedBy: Long = 0
         protected set
 
     @Column(name = "deleted_at", insertable = false, updatable = false, columnDefinition = "DATETIME")
@@ -49,6 +49,5 @@ abstract class BaseEntity {
 
     @Column(name = "deleted_by", insertable = false, updatable = false, length = 50)
     @Comment("삭제자")
-    lateinit var deletedBy: String
-        protected set
+    val deletedBy: Long? = null
 }

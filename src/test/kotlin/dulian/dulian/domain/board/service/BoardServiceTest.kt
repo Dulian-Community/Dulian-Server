@@ -70,7 +70,7 @@ class BoardServiceTest : BehaviorSpec({
             .sample()
 
         Given("사용자 정보가 존재하지 않을 경우") {
-            every { memberRepository.findByUserId(any()) } returns null
+            every { memberRepository.findByIdOrNull(any()) } returns null
 
             When("게시물 등록 시") {
                 val exception = shouldThrow<CustomException> {
@@ -80,13 +80,13 @@ class BoardServiceTest : BehaviorSpec({
                 Then("exception") {
                     exception shouldBe CustomException(CommonErrorCode.UNAUTHORIZED)
 
-                    verify { memberRepository.findByUserId(any()) }
+                    verify { memberRepository.findByIdOrNull(any()) }
                 }
             }
         }
 
         Given("이미지 개수가 맞지 않는 경우") {
-            every { memberRepository.findByUserId(any()) } returns member
+            every { memberRepository.findByIdOrNull(any()) } returns member
             every { atchFileDetailRepository.findByAtchFileDetailIdIn(any()) } returns listOf(atchFileDetail)
 
             When("게시물 등록 시") {
@@ -95,14 +95,14 @@ class BoardServiceTest : BehaviorSpec({
                 Then("exception") {
                     exception shouldBe CustomException(CommonErrorCode.INVALID_PARAMETER)
 
-                    verify { memberRepository.findByUserId(any()) }
+                    verify { memberRepository.findByIdOrNull(any()) }
                     verify { atchFileDetailRepository.findByAtchFileDetailIdIn(any()) }
                 }
             }
         }
 
         Given("정상적인 요청인 경우") {
-            every { memberRepository.findByUserId(any()) } returns member
+            every { memberRepository.findByIdOrNull(any()) } returns member
             every { atchFileDetailRepository.findByAtchFileDetailIdIn(any()) } returns listOf(clearAtchFileDetail)
             every { boardRepository.save(any()) } returns mockk()
             every { atchFileRepository.save(any()) } returns atchFile
@@ -113,7 +113,7 @@ class BoardServiceTest : BehaviorSpec({
                 boardService.addBoard(request)
 
                 Then("성공") {
-                    verify { memberRepository.findByUserId(any()) }
+                    verify { memberRepository.findByIdOrNull(any()) }
                     verify { atchFileDetailRepository.findByAtchFileDetailIdIn(any()) }
                     verify { boardRepository.save(any()) }
                     verify { atchFileRepository.save(any()) }
@@ -212,8 +212,8 @@ class BoardServiceTest : BehaviorSpec({
                 .sample()
             mockkObject(SecurityUtils)
             every { boardRepository.findBoardAndTagsAndAtchFileAndAtchFileDetailsByBoardId(any()) } returns savedBoardWithTag
-            every { SecurityUtils.getCurrentUserId() } returns "1"
-            every { memberRepository.findByUserId(any()) } returns wrongMember
+            every { SecurityUtils.getCurrentUserId() } returns 1L
+            every { memberRepository.findByIdOrNull(any()) } returns wrongMember
 
             When("게시물 수정 시") {
                 val exception = shouldThrow<CustomException> { boardService.modifyBoard(request) }
@@ -222,7 +222,7 @@ class BoardServiceTest : BehaviorSpec({
                     exception shouldBe CustomException(BoardErrorCode.BOARD_NOT_FOUND)
 
                     verify { boardRepository.findBoardAndTagsAndAtchFileAndAtchFileDetailsByBoardId(any()) }
-                    verify { memberRepository.findByUserId(any()) }
+                    verify { memberRepository.findByIdOrNull(any()) }
                 }
             }
         }
@@ -236,9 +236,9 @@ class BoardServiceTest : BehaviorSpec({
 
             mockkObject(SecurityUtils)
             every { boardRepository.findBoardAndTagsAndAtchFileAndAtchFileDetailsByBoardId(any()) } returns savedBoardWithTag
-            every { SecurityUtils.getCurrentUserId() } returns "1"
+            every { SecurityUtils.getCurrentUserId() } returns 1L
             every { boardRepository.save(any()) } returns mockk()
-            every { memberRepository.findByUserId(any()) } returns member
+            every { memberRepository.findByIdOrNull(any()) } returns member
 
             When("게시물 수정 시") {
                 boardService.modifyBoard(requestForTag)
@@ -254,11 +254,11 @@ class BoardServiceTest : BehaviorSpec({
         Given("저장된 태그가 3개일 때 2개를 삭제하고, 3개를 새롭게 저장하는 경우") {
             mockkObject(SecurityUtils)
             every { boardRepository.findBoardAndTagsAndAtchFileAndAtchFileDetailsByBoardId(any()) } returns savedBoardWithTag
-            every { SecurityUtils.getCurrentUserId() } returns "1"
+            every { SecurityUtils.getCurrentUserId() } returns 1L
             every { tagRepository.deleteTagByTagIds(any()) } just Runs
             every { tagRepository.save(any()) } returns mockk()
             every { boardRepository.save(any()) } returns mockk()
-            every { memberRepository.findByUserId(any()) } returns member
+            every { memberRepository.findByIdOrNull(any()) } returns member
 
             When("게시물 수정 시") {
                 boardService.modifyBoard(request)
@@ -281,9 +281,9 @@ class BoardServiceTest : BehaviorSpec({
 
             mockkObject(SecurityUtils)
             every { boardRepository.findBoardAndTagsAndAtchFileAndAtchFileDetailsByBoardId(any()) } returns savedBoardWithImage
-            every { SecurityUtils.getCurrentUserId() } returns "1"
+            every { SecurityUtils.getCurrentUserId() } returns 1L
             every { boardRepository.save(any()) } returns mockk()
-            every { memberRepository.findByUserId(any()) } returns member
+            every { memberRepository.findByIdOrNull(any()) } returns member
 
             When("게시물 수정 시") {
                 boardService.modifyBoard(requestWithImage)
@@ -308,12 +308,12 @@ class BoardServiceTest : BehaviorSpec({
 
             mockkObject(SecurityUtils)
             every { boardRepository.findBoardAndTagsAndAtchFileAndAtchFileDetailsByBoardId(any()) } returns savedBoardWithImage
-            every { SecurityUtils.getCurrentUserId() } returns "1"
+            every { SecurityUtils.getCurrentUserId() } returns 1L
             every { boardRepository.save(any()) } returns mockk()
             every { atchFileDetailRepository.deleteAtchFileDetailByAtchFileDetailIds(any()) } just Runs
             every { atchFileDetailRepository.findByAtchFileDetailIdIn(any()) } returns listOf(clearAtchFileDetail)
             every { atchFileDetailRepository.updateAtchFileDetails(any(), any()) } just Runs
-            every { memberRepository.findByUserId(any()) } returns member
+            every { memberRepository.findByIdOrNull(any()) } returns member
 
             When("게시물 수정 시") {
                 boardService.modifyBoard(requestWithImage)
@@ -340,12 +340,12 @@ class BoardServiceTest : BehaviorSpec({
 
             mockkObject(SecurityUtils)
             every { boardRepository.findBoardAndTagsAndAtchFileAndAtchFileDetailsByBoardId(any()) } returns savedBoardWithTag
-            every { SecurityUtils.getCurrentUserId() } returns "1"
+            every { SecurityUtils.getCurrentUserId() } returns 1L
             every { boardRepository.save(any()) } returns mockk()
             every { atchFileDetailRepository.findByAtchFileDetailIdIn(any()) } returns listOf(clearAtchFileDetail)
             every { atchFileRepository.save(any()) } returns atchFile
             every { atchFileDetailRepository.updateAtchFileDetails(any(), any()) } just Runs
-            every { memberRepository.findByUserId(any()) } returns member
+            every { memberRepository.findByIdOrNull(any()) } returns member
 
             When("게시물 수정 시") {
                 boardService.modifyBoard(requestWithImage)
@@ -390,8 +390,8 @@ class BoardServiceTest : BehaviorSpec({
                 .sample()
             mockkObject(SecurityUtils)
             every { boardRepository.findByIdOrNull(any()) } returns savedBoard
-            every { SecurityUtils.getCurrentUserId() } returns "1"
-            every { memberRepository.findByUserId(any()) } returns wrongMember
+            every { SecurityUtils.getCurrentUserId() } returns 1L
+            every { memberRepository.findByIdOrNull(any()) } returns wrongMember
 
             When("게시물 삭제 시") {
                 val exception = shouldThrow<CustomException> { boardService.removeBoard(boardId) }
@@ -407,8 +407,8 @@ class BoardServiceTest : BehaviorSpec({
         Given("정상적인 요청인 경우") {
             mockkObject(SecurityUtils)
             every { boardRepository.findByIdOrNull(any()) } returns savedBoard
-            every { SecurityUtils.getCurrentUserId() } returns "1"
-            every { memberRepository.findByUserId(any()) } returns member
+            every { SecurityUtils.getCurrentUserId() } returns 1L
+            every { memberRepository.findByIdOrNull(any()) } returns member
             every { boardRepository.delete(any()) } just Runs
 
             When("게시물 삭제 시") {

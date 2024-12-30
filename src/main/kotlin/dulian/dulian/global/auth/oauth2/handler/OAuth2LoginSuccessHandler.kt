@@ -32,7 +32,7 @@ class OAuth2LoginSuccessHandler(
         refreshTokenRepository.save(
             RefreshToken.of(
                 refreshToken,
-                authentication.name
+                authentication.name.toLong()
             )
         )
 

@@ -47,6 +47,7 @@ class LoginServiceTest : BehaviorSpec({
             .set("socialType", null)
             .sample()
         val member = monkeyFixture.giveMeBuilder(Member::class.java)
+            .set("memberId", 1L)
             .set("socialType", null)
             .sample()
         val socialMember = monkeyFixture.giveMeBuilder(Member::class.java)

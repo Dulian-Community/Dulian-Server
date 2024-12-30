@@ -11,14 +11,24 @@ object SecurityUtils {
      *
      * @return 사용자 ID
      */
-    fun getCurrentUserId(): String {
+    fun getCurrentUserId(): Long {
         val authentication = SecurityContextHolder.getContext().authentication
         if (authentication != null && authentication.isAuthenticated) {
             return (authentication.name == ANONYMOUS_USER).not().let {
-                authentication.name
+                authentication.name.toLong()
             }
         }
 
-        return "SYSTEM"
+        return 0L
+    }
+
+    /**
+     * 현재 사용자가 인증되어 있는지 확인
+     *
+     * @return 인증 여부
+     */
+    fun isAuthorized(): Boolean {
+        val authentication = SecurityContextHolder.getContext().authentication
+        return authentication != null && authentication.isAuthenticated && authentication.name != ANONYMOUS_USER
     }
 }

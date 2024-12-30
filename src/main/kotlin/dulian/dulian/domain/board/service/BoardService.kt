@@ -48,7 +48,7 @@ class BoardService(
         request: GeneralBoardAddDto.Request,
     ) {
         // 사용자 정보 조회
-        val member = memberRepository.findByUserId(SecurityUtils.getCurrentUserId())
+        val member = memberRepository.findByIdOrNull(SecurityUtils.getCurrentUserId())
             ?: throw CustomException(CommonErrorCode.UNAUTHORIZED)
 
         // 이미지 저장
@@ -92,7 +92,7 @@ class BoardService(
 
         // 본인의 게시물인지 검증
         val memberId = board.member.memberId!!
-        val member = memberRepository.findByUserId(SecurityUtils.getCurrentUserId())
+        val member = memberRepository.findByIdOrNull(SecurityUtils.getCurrentUserId())
             ?: throw CustomException(CommonErrorCode.UNAUTHORIZED)
         if (memberId != member.memberId) {
             throw CustomException(BoardErrorCode.BOARD_NOT_FOUND)
@@ -170,7 +170,7 @@ class BoardService(
 
         // 본인의 게시물인지 검증
         val memberId = board.member.memberId!!
-        val member = memberRepository.findByUserId(SecurityUtils.getCurrentUserId())
+        val member = memberRepository.findByIdOrNull(SecurityUtils.getCurrentUserId())
             ?: throw CustomException(CommonErrorCode.UNAUTHORIZED)
         if (memberId != member.memberId) {
             throw CustomException(BoardErrorCode.BOARD_NOT_FOUND)

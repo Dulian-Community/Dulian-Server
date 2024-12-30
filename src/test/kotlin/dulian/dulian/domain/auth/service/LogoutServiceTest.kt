@@ -17,13 +17,13 @@ class LogoutServiceTest : BehaviorSpec({
         val response = MockHttpServletResponse()
 
         Given("정상적인 경우") {
-            every { refreshTokenRepository.deleteByUserId(any()) } just Runs
+            every { refreshTokenRepository.deleteByMemberId(any()) } just Runs
 
             When("로그아웃을 하면") {
                 logoutService.logout(response)
 
                 Then("로그아웃 성공") {
-                    verify { refreshTokenRepository.deleteByUserId(any()) }
+                    verify { refreshTokenRepository.deleteByMemberId(any()) }
                 }
             }
         }

@@ -24,7 +24,7 @@ class BoardLikeService(
         boardId: Long
     ) {
         // 사용자 정보 조회
-        val member = memberRepository.findByUserId(SecurityUtils.getCurrentUserId())
+        val member = memberRepository.findByIdOrNull(SecurityUtils.getCurrentUserId())
             ?: throw CustomException(CommonErrorCode.UNAUTHORIZED)
 
         // 이미 좋아요를 누른 게시물인 경우 검증
@@ -49,7 +49,7 @@ class BoardLikeService(
         boardId: Long
     ) {
         // 사용자 정보 조회
-        val member = memberRepository.findByUserId(SecurityUtils.getCurrentUserId())
+        val member = memberRepository.findByIdOrNull(SecurityUtils.getCurrentUserId())
             ?: throw CustomException(CommonErrorCode.UNAUTHORIZED)
 
         // 좋아요 정보 조회

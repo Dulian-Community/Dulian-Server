@@ -8,5 +8,5 @@ interface RefreshTokenRepository : JpaRepository<RefreshToken, Long> {
 
     fun findFirstByTokenAndExpiredInAfterOrderByExpiredInDesc(token: String, currentTime: LocalDateTime): RefreshToken?
 
-    fun deleteByUserId(userId: String)
+    fun deleteByMemberId(memberId: Long)
 }

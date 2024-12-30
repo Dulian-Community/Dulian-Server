@@ -34,7 +34,7 @@ class TokenRefreshService(
 
         // Authentication 객체 생성
         val authentication = UsernamePasswordAuthenticationToken(
-            savedRefreshToken.userId,
+            savedRefreshToken.memberId,
             "",
             listOf(Role.ROLE_USER).map { SimpleGrantedAuthority(it.name) }
         )
