@@ -63,7 +63,7 @@ class BoardLikeControllerTest(
         val boardId = 1L
 
         context("정상적인 요청인 경우") {
-            every { boardLikeService.like(boardId) } just Runs
+            every { boardLikeService.toggleLike(boardId) } just Runs
 
             it("게시물 좋아요 성공") {
                 mockMvc.perform(
@@ -88,37 +88,9 @@ class BoardLikeControllerTest(
                     )
             }
         }
-
-        context("이미 좋아요를 누른 게시물인 경우") {
-            every { boardLikeService.like(boardId) } throws CustomException(BoardErrorCode.ALREADY_LIKED)
-
-            it("게시물 좋아요 실패") {
-                mockMvc.perform(
-                    post("/api/v1/board/like/{boardId}", boardId)
-                )
-                    .andExpect(status().isBadRequest)
-                    .andExpect(jsonPath("message").value(BoardErrorCode.ALREADY_LIKED.message))
-                    .andDo(
-                        document(
-                            "board-like",
-                            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-                            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
-                            resource(
-                                ResourceSnippetParameters.builder()
-                                    .tag("게시물")
-                                    .summary("게시물 좋아요 API")
-                                    .pathParameters(
-                                        parameterWithName("boardId").description("게시물 번호"),
-                                    )
-                                    .build()
-                            )
-                        )
-                    )
-            }
-        }
-
+        
         context("게시물 정보가 존재하지 않는 경우") {
-            every { boardLikeService.like(boardId) } throws CustomException(BoardErrorCode.BOARD_NOT_FOUND)
+            every { boardLikeService.toggleLike(boardId) } throws CustomException(BoardErrorCode.BOARD_NOT_FOUND)
 
             it("게시물 좋아요 실패") {
                 mockMvc.perform(
@@ -135,65 +107,6 @@ class BoardLikeControllerTest(
                                 ResourceSnippetParameters.builder()
                                     .tag("게시물")
                                     .summary("게시물 좋아요 API")
-                                    .pathParameters(
-                                        parameterWithName("boardId").description("게시물 번호"),
-                                    )
-                                    .build()
-                            )
-                        )
-                    )
-            }
-        }
-    }
-
-    describe("게시물 좋아요 취소 API") {
-        val boardId = 1L
-
-        context("정상적인 요청인 경우") {
-            every { boardLikeService.unlike(boardId) } just Runs
-
-            it("게시물 좋아요 취소 성공") {
-                mockMvc.perform(
-                    post("/api/v1/board/unlike/{boardId}", boardId)
-                )
-                    .andExpect(status().isOk)
-                    .andDo(
-                        document(
-                            "board-unlike",
-                            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-                            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
-                            resource(
-                                ResourceSnippetParameters.builder()
-                                    .tag("게시물")
-                                    .summary("게시물 좋아요 취소 API")
-                                    .pathParameters(
-                                        parameterWithName("boardId").description("게시물 번호"),
-                                    )
-                                    .build()
-                            )
-                        )
-                    )
-            }
-        }
-
-        context("좋아요를 누르지 않은 게시물인 경우") {
-            every { boardLikeService.unlike(boardId) } throws CustomException(BoardErrorCode.BOARD_LIKE_NOT_FOUND)
-
-            it("게시물 좋아요 취소 실패") {
-                mockMvc.perform(
-                    post("/api/v1/board/unlike/{boardId}", boardId)
-                )
-                    .andExpect(status().isNotFound)
-                    .andExpect(jsonPath("message").value(BoardErrorCode.BOARD_LIKE_NOT_FOUND.message))
-                    .andDo(
-                        document(
-                            "board-unlike",
-                            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-                            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
-                            resource(
-                                ResourceSnippetParameters.builder()
-                                    .tag("게시물")
-                                    .summary("게시물 좋아요 취소 API")
                                     .pathParameters(
                                         parameterWithName("boardId").description("게시물 번호"),
                                     )

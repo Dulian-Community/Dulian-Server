@@ -20,43 +20,26 @@ class BoardLikeService(
 ) {
 
     @Transactional
-    fun like(
+    fun toggleLike(
         boardId: Long
     ) {
         // 사용자 정보 조회
         val member = memberRepository.findByIdOrNull(SecurityUtils.getCurrentUserId())
             ?: throw CustomException(CommonErrorCode.UNAUTHORIZED)
-
-        // 이미 좋아요를 누른 게시물인 경우 검증
-        if (boardLikeRepository.existsByBoardBoardIdAndMemberMemberId(boardId, member.memberId!!)) {
-            throw CustomException(BoardErrorCode.ALREADY_LIKED)
-        }
 
         // 게시물 정보 조회
         val board = boardRepository.findByIdOrNull(boardId)
             ?: throw CustomException(BoardErrorCode.BOARD_NOT_FOUND)
-
-        // 좋아요 정보 저장
-        val boardLike = BoardLike.of(
-            board = board,
-            member = member
-        )
-        boardLikeRepository.save(boardLike)
-    }
-
-    @Transactional
-    fun unlike(
-        boardId: Long
-    ) {
-        // 사용자 정보 조회
-        val member = memberRepository.findByIdOrNull(SecurityUtils.getCurrentUserId())
-            ?: throw CustomException(CommonErrorCode.UNAUTHORIZED)
-
-        // 좋아요 정보 조회
-        val boardLike = boardLikeRepository.findByBoardBoardIdAndMemberMemberId(boardId, member.memberId!!)
-            ?: throw CustomException(BoardErrorCode.BOARD_LIKE_NOT_FOUND)
-
-        // 좋아요 정보 삭제
-        boardLikeRepository.delete(boardLike)
+        
+        // 좋아요 저장 or 삭제
+        boardLikeRepository.findByBoardBoardIdAndMemberMemberId(boardId, member.memberId!!)?.let {
+            boardLikeRepository.delete(it)
+        } ?: run {
+            val boardLike = BoardLike.of(
+                board = board,
+                member = member
+            )
+            boardLikeRepository.save(boardLike)
+        }
     }
 }

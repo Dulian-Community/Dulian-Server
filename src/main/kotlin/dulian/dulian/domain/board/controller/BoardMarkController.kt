@@ -15,25 +15,13 @@ class BoardMarkController(
 ) {
 
     /**
-     * 게시물 좋아요 API
+     * 게시물 북마크 등록/취소 API
      */
     @PostMapping("/mark/{boardId}")
     fun mark(
         @PathVariable("boardId") boardId: Long
     ): ResponseEntity<ApiResponse<Unit>> {
-        boardMarkService.mark(boardId)
-
-        return ApiResponse.success()
-    }
-
-    /**
-     * 게시물 좋아요 취소 API
-     */
-    @PostMapping("/unmark/{boardId}")
-    fun unmark(
-        @PathVariable("boardId") boardId: Long
-    ): ResponseEntity<ApiResponse<Unit>> {
-        boardMarkService.unmark(boardId)
+        boardMarkService.toggleMark(boardId)
 
         return ApiResponse.success()
     }

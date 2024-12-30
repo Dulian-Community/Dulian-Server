@@ -15,25 +15,13 @@ class BoardLikeController(
 ) {
 
     /**
-     * 게시물 좋아요 API
+     * 게시물 좋아요/좋아요 취소 API
      */
     @PostMapping("/like/{boardId}")
     fun like(
         @PathVariable("boardId") boardId: Long
     ): ResponseEntity<ApiResponse<Unit>> {
-        boardLikeService.like(boardId)
-
-        return ApiResponse.success()
-    }
-
-    /**
-     * 게시물 좋아요 취소 API
-     */
-    @PostMapping("/unlike/{boardId}")
-    fun unlike(
-        @PathVariable("boardId") boardId: Long
-    ): ResponseEntity<ApiResponse<Unit>> {
-        boardLikeService.unlike(boardId)
+        boardLikeService.toggleLike(boardId)
 
         return ApiResponse.success()
     }
