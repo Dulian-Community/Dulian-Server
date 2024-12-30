@@ -2,6 +2,7 @@ package dulian.dulian.domain.board.dto
 
 import dulian.dulian.domain.board.enums.SearchCondition
 import dulian.dulian.domain.board.enums.SearchOrder
+import dulian.dulian.global.common.DateFormat
 import dulian.dulian.global.config.db.enums.YNFlag
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -14,7 +15,9 @@ class SearchDto {
         val query: String?,
         val condition: String?,
         val order: String?,
+        @field:DateFormat
         val startDate: String?, // TODO : 날짜 형식 맞는지 검증
+        @field:DateFormat
         val endDate: String?,// TODO : 날짜 형식 맞는지 검증
         val isMarked: String?
     ) {

@@ -27,7 +27,7 @@ class BoardController(
      */
     @GetMapping("/search")
     fun searchBoard(
-        @ModelAttribute request: SearchDto.Request
+        @ModelAttribute @Valid request: SearchDto.Request
     ): ResponseEntity<ApiResponse<PageResponseDto<SearchDto.Response>>> {
         return ApiResponse.success(boardService.search(request))
     }
