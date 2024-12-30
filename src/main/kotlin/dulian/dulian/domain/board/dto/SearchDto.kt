@@ -1,5 +1,6 @@
 package dulian.dulian.domain.board.dto
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import dulian.dulian.domain.board.enums.SearchCondition
 import dulian.dulian.domain.board.enums.SearchOrder
 import dulian.dulian.global.common.DateFormat
@@ -60,9 +61,13 @@ class SearchDto {
         val content: String,
         val viewCount: Long,
         val createdAt: LocalDateTime,
-        val isMarked: YNFlag,
+        @JsonIgnore
+        val boardMarkId: Long,
         val likeCount: Long
     ) {
         var tags: List<String> = emptyList()
+
+        val isMarked: YNFlag
+            get() = if (this.boardMarkId > 0L) YNFlag.Y else YNFlag.N
     }
 }

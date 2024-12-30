@@ -13,12 +13,10 @@ object SecurityUtils {
      */
     fun getCurrentUserId(): Long {
         val authentication = SecurityContextHolder.getContext().authentication
-        if (authentication != null && authentication.isAuthenticated) {
-            return (authentication.name == ANONYMOUS_USER).not().let {
-                authentication.name.toLong()
-            }
-        }
 
+        if (authentication != null && authentication.isAuthenticated && authentication.name != ANONYMOUS_USER) {
+            return authentication.name.toLong()
+        }
         return 0L
     }
 
