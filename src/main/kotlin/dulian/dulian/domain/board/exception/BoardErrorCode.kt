@@ -14,7 +14,9 @@ enum class BoardErrorCode(
     BOARD_NOT_FOUND(HttpStatus.NOT_FOUND, "B003", "게시물을 찾을 수 없습니다."),
     TOO_MANY_5_TAGS(HttpStatus.BAD_REQUEST, "B004", "태그는 최대 5개까지 등록할 수 있습니다."),
     ALREADY_LIKED(HttpStatus.BAD_REQUEST, "B005", "이미 좋아요를 누르셨습니다."),
-    BOARD_LIKE_NOT_FOUND(HttpStatus.NOT_FOUND, "B006", "좋아요 정보를 찾을 수 없습니다.");
+    BOARD_LIKE_NOT_FOUND(HttpStatus.NOT_FOUND, "B006", "좋아요 정보를 찾을 수 없습니다."),
+    BOARD_MARK_NOT_FOUND(HttpStatus.NOT_FOUND, "B007", "북마크 정보를 찾을 수 없습니다."),
+    ALREADY_MARKED(HttpStatus.BAD_REQUEST, "B008", "이미 북마크를 누르셨습니다.");
 
     override val errorName: String
         get() = this.name
