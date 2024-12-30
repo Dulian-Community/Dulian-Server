@@ -19,6 +19,7 @@ import dulian.dulian.domain.auth.service.TokenRefreshService
 import dulian.dulian.global.auth.jwt.dto.TokenDto
 import dulian.dulian.global.exception.CustomException
 import dulian.dulian.utils.ControllerTestUtils
+import dulian.dulian.utils.fixtureMonkey
 import io.kotest.core.spec.style.DescribeSpec
 import io.mockk.Runs
 import io.mockk.every
@@ -60,7 +61,7 @@ class AuthControllerTest(
 ) : DescribeSpec({
     val restDocumentation = ManualRestDocumentation()
     val mockMvc = ControllerTestUtils.initMockMvc(context, restDocumentation)
-    val fixtureMonkey = ControllerTestUtils.fixtureMonkey()
+    val fixtureMonkey = fixtureMonkey()
 
     beforeEach { restDocumentation.beforeTest(javaClass, it.name.testName) }
     afterEach { restDocumentation.afterTest() }

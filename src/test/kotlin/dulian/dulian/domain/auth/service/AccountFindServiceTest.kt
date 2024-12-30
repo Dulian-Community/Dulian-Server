@@ -1,8 +1,5 @@
 package dulian.dulian.domain.auth.service
 
-import com.navercorp.fixturemonkey.FixtureMonkey
-import com.navercorp.fixturemonkey.jakarta.validation.plugin.JakartaValidationPlugin
-import com.navercorp.fixturemonkey.kotlin.KotlinPlugin
 import dulian.dulian.domain.auth.dto.FindIdDto
 import dulian.dulian.domain.auth.dto.FindPasswordDto
 import dulian.dulian.domain.auth.entity.Member
@@ -12,6 +9,7 @@ import dulian.dulian.domain.mail.components.EmailUtils
 import dulian.dulian.domain.mail.entity.EmailCode
 import dulian.dulian.domain.mail.repository.EmailCodeRepository
 import dulian.dulian.global.exception.CustomException
+import dulian.dulian.utils.fixtureMonkey
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.IsolationMode
 import io.kotest.core.spec.style.BehaviorSpec
@@ -35,10 +33,7 @@ class AccountFindServiceTest : BehaviorSpec({
         passwordEncoder
     )
 
-    val fixtureMonkey = FixtureMonkey.builder()
-        .plugin(KotlinPlugin())
-        .plugin(JakartaValidationPlugin())
-        .build()
+    val fixtureMonkey = fixtureMonkey()
 
     Context("아이디 찾기 - Step1") {
         val request = fixtureMonkey.giveMeOne(FindIdDto.Step1Request::class.java)

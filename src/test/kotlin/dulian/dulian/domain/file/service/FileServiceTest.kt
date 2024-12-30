@@ -1,14 +1,12 @@
 package dulian.dulian.domain.file.service
 
-import com.navercorp.fixturemonkey.FixtureMonkey
-import com.navercorp.fixturemonkey.jakarta.validation.plugin.JakartaValidationPlugin
-import com.navercorp.fixturemonkey.kotlin.KotlinPlugin
 import dulian.dulian.domain.file.components.S3Utils
 import dulian.dulian.domain.file.entity.AtchFileDetail
 import dulian.dulian.domain.file.enums.S3Folder
 import dulian.dulian.domain.file.exception.FileErrorCode
 import dulian.dulian.domain.file.repository.AtchFileDetailRepository
 import dulian.dulian.global.exception.CustomException
+import dulian.dulian.utils.fixtureMonkey
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.IsolationMode
 import io.kotest.core.spec.style.BehaviorSpec
@@ -28,10 +26,7 @@ class FileServiceTest : BehaviorSpec({
 
     val fileService = FileService(s3Utils, atchFileDetailRepository, imageExtensions, s3Url)
 
-    val fixtureMonkey = FixtureMonkey.builder()
-        .plugin(KotlinPlugin())
-        .plugin(JakartaValidationPlugin())
-        .build()
+    val fixtureMonkey = fixtureMonkey()
 
     Context("이미지 파일 저장") {
         val atchFileDetail = fixtureMonkey.giveMeBuilder(AtchFileDetail::class.java)

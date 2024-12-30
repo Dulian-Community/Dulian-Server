@@ -1,8 +1,5 @@
 package dulian.dulian.domain.board.service
 
-import com.navercorp.fixturemonkey.FixtureMonkey
-import com.navercorp.fixturemonkey.jakarta.validation.plugin.JakartaValidationPlugin
-import com.navercorp.fixturemonkey.kotlin.KotlinPlugin
 import dulian.dulian.domain.auth.entity.Member
 import dulian.dulian.domain.auth.repository.MemberRepository
 import dulian.dulian.domain.board.dto.BoardDto
@@ -22,6 +19,7 @@ import dulian.dulian.global.common.PageResponseDto
 import dulian.dulian.global.exception.CommonErrorCode
 import dulian.dulian.global.exception.CustomException
 import dulian.dulian.global.utils.SecurityUtils
+import dulian.dulian.utils.fixtureMonkey
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.IsolationMode
 import io.kotest.core.spec.style.BehaviorSpec
@@ -48,10 +46,7 @@ class BoardServiceTest : BehaviorSpec({
             "s3Url"
         )
 
-    val fixtureMonkey = FixtureMonkey.builder()
-        .plugin(KotlinPlugin())
-        .plugin(JakartaValidationPlugin())
-        .build()
+    val fixtureMonkey = fixtureMonkey()
 
     Context("게시물 등록") {
         val request = fixtureMonkey.giveMeBuilder(GeneralBoardAddDto.Request::class.java)

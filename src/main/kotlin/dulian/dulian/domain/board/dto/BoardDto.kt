@@ -12,14 +12,18 @@ data class BoardDto(
     @JsonIgnore
     val memberId: Long,
     val viewCount: Long,
-    val likeCount: Long,
-    val isLiked: Long,
     val isBookmarked: YNFlag,
     var images: List<AtchFileDetailsDto>?,
-    var tags: List<Tag>?
+    var tags: List<Tag>?,
+    val likeCount: Long,
+    @JsonIgnore
+    val isLikedFlag: Boolean
 ) {
     val isMine: YNFlag
         get() = if (this.memberId == SecurityUtils.getCurrentUserId()) YNFlag.Y else YNFlag.N
+
+    val isLiked: YNFlag
+        get() = if (this.isLikedFlag) YNFlag.Y else YNFlag.N
 
     // 이미지 URL 세팅
     fun initImageUrls(s3Url: String) {

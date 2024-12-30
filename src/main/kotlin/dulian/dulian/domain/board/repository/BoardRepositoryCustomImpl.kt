@@ -29,20 +29,6 @@ class BoardRepositoryCustomImpl(
     private val queryFactory: JPAQueryFactory
 ) : BoardRepositoryCustom {
 
-    private fun a(): Expression<out Any> {
-        println(SecurityUtils.getCurrentUserId())
-        return if (SecurityUtils.isAuthorized()) {
-            JPAExpressions.select(boardLike.count())
-                .from(boardLike)
-                .where(
-                    boardLike.board.eq(board)
-//                        .and(boardLike.member.userId.eq(SecurityUtils.getCurrentUserId()))
-                )
-        } else {
-            Expressions.constant(0)
-        }
-    }
-
     override fun getBoard(boardId: Long): BoardDto? {
         val result = queryFactory.select(
             board
@@ -64,11 +50,6 @@ class BoardRepositoryCustomImpl(
                             board.member.nickname,
                             board.member.memberId,
                             board.viewCount,
-                            JPAExpressions.select(boardLike.count())
-                                .from(boardLike)
-                                .where(boardLike.board.eq(board)),
-                            a(),
-//                            Expressions.constant(YNFlag.Y), // TODO : 좋아요 여부
                             Expressions.constant(YNFlag.N), // TODO : 북마크 여부
                             list(
                                 Projections.constructor(
@@ -84,7 +65,11 @@ class BoardRepositoryCustomImpl(
                                     tag.tagId,
                                     tag.name
                                 )
-                            )
+                            ),
+                            JPAExpressions.select(boardLike.count())
+                                .from(boardLike)
+                                .where(boardLike.board.eq(board)),
+                            createIsLikedSubQuery(),
                         )
                     )
             )
@@ -272,4 +257,21 @@ class BoardRepositoryCustomImpl(
 
         return orderSpecifiers
     }
+
+    /**
+     * 좋아요 여부 서브 쿼리 생성
+     */
+    private fun createIsLikedSubQuery(): Expression<Boolean>? {
+        return if (SecurityUtils.isAuthorized()) {
+            JPAExpressions.select(boardLike.count())
+                .from(boardLike)
+                .where(
+                    boardLike.board.eq(board)
+                        .and(boardLike.member.memberId.eq(SecurityUtils.getCurrentUserId()))
+                ).exists()
+        } else {
+            Expressions.constant(false)
+        }
+    }
+
 }

@@ -1,8 +1,5 @@
 package dulian.dulian.domain.auth.service
 
-import com.navercorp.fixturemonkey.FixtureMonkey
-import com.navercorp.fixturemonkey.jakarta.validation.plugin.JakartaValidationPlugin
-import com.navercorp.fixturemonkey.kotlin.KotlinPlugin
 import dulian.dulian.domain.auth.dto.LoginDto
 import dulian.dulian.domain.auth.entity.Member
 import dulian.dulian.domain.auth.exception.LoginErrorCode
@@ -12,6 +9,7 @@ import dulian.dulian.global.auth.enums.SocialType
 import dulian.dulian.global.auth.jwt.components.JwtTokenProvider
 import dulian.dulian.global.auth.jwt.dto.TokenDto
 import dulian.dulian.global.exception.CustomException
+import dulian.dulian.utils.fixtureMonkey
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.IsolationMode
 import io.kotest.core.spec.style.BehaviorSpec
@@ -37,10 +35,7 @@ class LoginServiceTest : BehaviorSpec({
         refreshTokenRepository
     )
 
-    val monkeyFixture = FixtureMonkey.builder()
-        .plugin(KotlinPlugin())
-        .plugin(JakartaValidationPlugin())
-        .build()
+    val monkeyFixture = fixtureMonkey()
 
     Context("로그인") {
         val request = monkeyFixture.giveMeBuilder(LoginDto.Request::class.java)

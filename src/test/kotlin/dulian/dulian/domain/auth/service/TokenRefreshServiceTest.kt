@@ -1,14 +1,12 @@
 package dulian.dulian.domain.auth.service
 
-import com.navercorp.fixturemonkey.FixtureMonkey
-import com.navercorp.fixturemonkey.jakarta.validation.plugin.JakartaValidationPlugin
-import com.navercorp.fixturemonkey.kotlin.KotlinPlugin
 import dulian.dulian.domain.auth.entity.RefreshToken
 import dulian.dulian.domain.auth.exception.RefreshTokenErrorCode
 import dulian.dulian.domain.auth.repository.RefreshTokenRepository
 import dulian.dulian.global.auth.jwt.components.JwtTokenProvider
 import dulian.dulian.global.auth.jwt.dto.TokenDto
 import dulian.dulian.global.exception.CustomException
+import dulian.dulian.utils.fixtureMonkey
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.IsolationMode
 import io.kotest.core.spec.style.BehaviorSpec
@@ -31,10 +29,7 @@ class TokenRefreshServiceTest : BehaviorSpec({
         jwtTokenProvider
     )
 
-    val fixtureMonkey = FixtureMonkey.builder()
-        .plugin(KotlinPlugin())
-        .plugin(JakartaValidationPlugin())
-        .build()
+    val fixtureMonkey = fixtureMonkey()
 
     Context("토큰 갱신") {
         val request = spyk(MockHttpServletRequest())

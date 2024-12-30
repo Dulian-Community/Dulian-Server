@@ -5,9 +5,6 @@ import com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.document
 import com.epages.restdocs.apispec.ResourceDocumentation.resource
 import com.epages.restdocs.apispec.ResourceSnippetParameters
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.navercorp.fixturemonkey.FixtureMonkey
-import com.navercorp.fixturemonkey.jakarta.validation.plugin.JakartaValidationPlugin
-import com.navercorp.fixturemonkey.kotlin.KotlinPlugin
 import com.ninjasquad.springmockk.MockkBean
 import dulian.dulian.domain.board.dto.BoardDto
 import dulian.dulian.domain.board.dto.BoardModifyDto
@@ -20,6 +17,7 @@ import dulian.dulian.domain.file.exception.FileErrorCode
 import dulian.dulian.domain.file.service.FileService
 import dulian.dulian.global.common.PageResponseDto
 import dulian.dulian.global.exception.CustomException
+import dulian.dulian.utils.fixtureMonkey
 import io.kotest.core.spec.style.DescribeSpec
 import io.mockk.Runs
 import io.mockk.every
@@ -72,10 +70,7 @@ class BoardControllerTest(
         .alwaysDo<DefaultMockMvcBuilder>(MockMvcResultHandlers.print())
         .build()
 
-    val fixtureMonkey = FixtureMonkey.builder()
-        .plugin(KotlinPlugin())
-        .plugin(JakartaValidationPlugin())
-        .build()
+    val fixtureMonkey = fixtureMonkey()
 
     beforeEach { restDocumentation.beforeTest(javaClass, it.name.testName) }
     afterEach { restDocumentation.afterTest() }

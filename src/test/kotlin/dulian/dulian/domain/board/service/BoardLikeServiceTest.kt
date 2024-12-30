@@ -1,8 +1,5 @@
 package dulian.dulian.domain.board.service
 
-import com.navercorp.fixturemonkey.FixtureMonkey
-import com.navercorp.fixturemonkey.jakarta.validation.plugin.JakartaValidationPlugin
-import com.navercorp.fixturemonkey.kotlin.KotlinPlugin
 import dulian.dulian.domain.auth.entity.Member
 import dulian.dulian.domain.auth.repository.MemberRepository
 import dulian.dulian.domain.board.entity.Board
@@ -13,6 +10,7 @@ import dulian.dulian.domain.board.repository.BoardRepository
 import dulian.dulian.global.exception.CommonErrorCode
 import dulian.dulian.global.exception.CustomException
 import dulian.dulian.global.utils.SecurityUtils
+import dulian.dulian.utils.fixtureMonkey
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
@@ -34,10 +32,7 @@ class BoardLikeServiceTest : DescribeSpec({
         boardRepository = boardRepository
     )
 
-    val fixtureMonkey = FixtureMonkey.builder()
-        .plugin(KotlinPlugin())
-        .plugin(JakartaValidationPlugin())
-        .build()
+    val fixtureMonkey = fixtureMonkey()
 
     describe("게시물 좋아요") {
         val member = fixtureMonkey.giveMeOne(Member::class.java)
