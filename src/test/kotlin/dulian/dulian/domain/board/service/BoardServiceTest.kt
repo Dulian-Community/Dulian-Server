@@ -1,5 +1,6 @@
 package dulian.dulian.domain.board.service
 
+import com.navercorp.fixturemonkey.kotlin.giveMeBuilder
 import dulian.dulian.domain.auth.entity.Member
 import dulian.dulian.domain.auth.repository.MemberRepository
 import dulian.dulian.domain.board.dto.BoardDto
@@ -155,33 +156,37 @@ class BoardServiceTest : BehaviorSpec({
     }
 
     Context("게시물 수정") {
-        val request = fixtureMonkey.giveMeBuilder(BoardModifyDto.Request::class.java)
+        val request = fixtureMonkey.giveMeBuilder<BoardModifyDto.Request>()
             .set("savedTagIds", listOf(3L))
             .set("tags", listOf("tag1", "tag2", "tag3"))
             .set("images", null)
             .sample()
-        val member = fixtureMonkey.giveMeBuilder(Member::class.java)
+        val member = fixtureMonkey.giveMeBuilder<Member>()
             .set("memberId", 1L)
             .sample()
-        val anyBoard = fixtureMonkey.giveMeBuilder(Board::class.java)
+        val anyBoard = fixtureMonkey.giveMeBuilder<Board>()
             .set("boardId", 1L)
             .set("member", member)
             .sample()
         val tag1 = Tag(1L, "tag", anyBoard)
         val tag2 = Tag(2L, "tag", anyBoard)
         val tag3 = Tag(3L, "tag", anyBoard)
-        val atchFileDetail = fixtureMonkey.giveMeBuilder(AtchFileDetail::class.java)
+        val atchFileDetail = fixtureMonkey.giveMeBuilder<AtchFileDetail>()
+            .setNotNull("atchFileDetailId")
             .set("atchFileDetailId", 1L)
             .sample()
-        val atchFile = fixtureMonkey.giveMeBuilder(AtchFile::class.java)
+        val atchFile = fixtureMonkey.giveMeBuilder<AtchFile>()
+            .setNotNull("atchFileId")
             .set("atchFileDetails", listOf(atchFileDetail))
             .sample()
-        val savedBoardWithTag = fixtureMonkey.giveMeBuilder(Board::class.java)
+        val savedBoardWithTag = fixtureMonkey.giveMeBuilder<Board>()
+            .setNotNull("boardId")
             .set("member", member)
             .set("tags", setOf(tag1, tag2, tag3))
             .set("atchFile", null)
             .sample()
-        val savedBoardWithImage = fixtureMonkey.giveMeBuilder(Board::class.java)
+        val savedBoardWithImage = fixtureMonkey.giveMeBuilder<Board>()
+            .setNotNull("boardId")
             .set("member", member)
             .set("tags", null)
             .set("atchFile", atchFile)

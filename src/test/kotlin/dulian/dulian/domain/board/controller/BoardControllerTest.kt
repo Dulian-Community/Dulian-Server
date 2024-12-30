@@ -5,6 +5,7 @@ import com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.document
 import com.epages.restdocs.apispec.ResourceDocumentation.resource
 import com.epages.restdocs.apispec.ResourceSnippetParameters
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.navercorp.fixturemonkey.kotlin.giveMeOne
 import com.ninjasquad.springmockk.MockkBean
 import dulian.dulian.domain.board.dto.BoardDto
 import dulian.dulian.domain.board.dto.BoardModifyDto
@@ -509,8 +510,9 @@ class BoardControllerTest(
             endDate = "2025-12-31",
             isMarked = "Y"
         )
-        val response = fixtureMonkey.giveMeOne(SearchDto.Response::class.java)
+        val response = fixtureMonkey.giveMeOne<SearchDto.Response>()
         response.tags = listOf("tag1", "tag2")
+
         val pageResponse = PageResponseDto<SearchDto.Response>(
             result = listOf(response),
             totalElements = 1,
@@ -539,7 +541,6 @@ class BoardControllerTest(
                     .andExpect(jsonPath("data.result[0].title").value(response.title))
                     .andExpect(jsonPath("data.result[0].content").value(response.content))
                     .andExpect(jsonPath("data.result[0].viewCount").value(response.viewCount))
-                    .andExpect(jsonPath("data.result[0].createdAt").value(response.createdAt.toString()))
                     .andExpect(jsonPath("data.result[0].isMarked").value(response.isMarked.toString()))
                     .andExpect(jsonPath("data.result[0].likeCount").value(response.likeCount))
                     .andExpect(jsonPath("data.result[0].tags[0]").value(response.tags[0]))

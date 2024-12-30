@@ -1,5 +1,6 @@
 package dulian.dulian.domain.board.service
 
+import com.navercorp.fixturemonkey.kotlin.giveMeBuilder
 import dulian.dulian.domain.auth.entity.Member
 import dulian.dulian.domain.auth.repository.MemberRepository
 import dulian.dulian.domain.board.entity.Board
@@ -35,8 +36,12 @@ class BoardLikeServiceTest : DescribeSpec({
     val fixtureMonkey = fixtureMonkey()
 
     describe("게시물 좋아요") {
-        val member = fixtureMonkey.giveMeOne(Member::class.java)
-        val board = fixtureMonkey.giveMeOne(Board::class.java)
+        val member = fixtureMonkey.giveMeBuilder<Member>()
+            .setNotNull("memberId")
+            .sample()
+        val board = fixtureMonkey.giveMeBuilder<Board>()
+            .setNotNull("boardId")
+            .sample()
 
         context("회원 정보가 존재하지 않는 경우") {
             mockkObject(SecurityUtils)
@@ -106,10 +111,12 @@ class BoardLikeServiceTest : DescribeSpec({
     }
 
     describe("게시물 좋아요 취소") {
-        val member = fixtureMonkey.giveMeBuilder(Member::class.java)
-            .set("memberId", 1L)
+        val member = fixtureMonkey.giveMeBuilder<Member>()
+            .setNotNull("memberId")
             .sample()
-        val board = fixtureMonkey.giveMeOne(Board::class.java)
+        val board = fixtureMonkey.giveMeBuilder<Board>()
+            .setNotNull("boardId")
+            .sample()
         val boardLike = BoardLike(
             board = board,
             member = member
