@@ -220,7 +220,7 @@ class RequestBuilder(
         }
     }
 
-    fun content(content: String) {
+    fun requestBody(content: String) {
         this.content = content
     }
 }
@@ -269,7 +269,9 @@ class AssertBuilder(
         path: String,
         value: Any?
     ) {
-        resultMatchers.add(jsonPath(path).value(value))
+        resultMatchers.add(
+            jsonPath(path).value(value)
+        )
     }
 }
 
@@ -280,7 +282,9 @@ class PathParameterBuilder {
         name: String,
         description: String
     ) {
-        pathParameterDescriptors.add(parameterWithName(name).description(description))
+        pathParameterDescriptors.add(
+            parameterWithName(name).description(description)
+        )
     }
 }
 
