@@ -9,6 +9,8 @@ import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document
 import org.springframework.restdocs.operation.preprocess.Preprocessors
 import org.springframework.restdocs.payload.FieldDescriptor
 import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
+import org.springframework.restdocs.payload.PayloadDocumentation.requestPartBody
+import org.springframework.restdocs.payload.RequestPartBodySnippet
 import org.springframework.restdocs.request.ParameterDescriptor
 import org.springframework.restdocs.request.RequestDocumentation.parameterWithName
 import org.springframework.restdocs.snippet.Snippet
@@ -16,8 +18,10 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.ResultActions
 import org.springframework.test.web.servlet.ResultMatcher
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder
+import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.util.MultiValueMap
 
@@ -36,35 +40,35 @@ class CustomRestDocsBuilder(
     private val tag: String,
     private val summary: String,
 ) {
-    private lateinit var requestBuilder: MockHttpServletRequestBuilder
+    private var requestBuilder: MockHttpServletRequestBuilder? = null
+    private var mockMultipartRequestBuilder: MockMultipartHttpServletRequestBuilder? = null
     private var assertBuilder: (AssertBuilder.() -> Unit)? = null
     private var pathParameterBuilder: (PathParameterBuilder.() -> Unit)? = null
+    private var status: ResultMatcher = MockMvcResultMatchers.status().isOk
 
     //    private var responseBodyBuilder: (ResponseBodyBuilder<Any>.() -> Unit)? = null
     private var responseBodyDescriptors: MutableList<FieldDescriptor>? = null
     private var requestBodyDescriptors: MutableList<FieldDescriptor>? = null
     private var queryParameterDescriptors: MutableList<ParameterDescriptor>? = null
+    private var requestPartBodySnippets: MutableList<RequestPartBodySnippet>? = null
 
     fun build() {
-//        val builder = RequestBuilder().apply(requestBuilder).build()
-        val resultActions = mockMvc.perform(requestBuilder)
+        val resultActions = if (requestBuilder != null) {
+            mockMvc.perform(requestBuilder!!)
+        } else if (mockMultipartRequestBuilder != null) {
+            mockMvc.perform(mockMultipartRequestBuilder!!)
+        } else {
+            throw IllegalArgumentException("RequestBuilder is null")
+        }
 
         assertBuilder?.let {
-            AssertBuilder(resultActions).apply(it).build()
+            AssertBuilder(status, resultActions).apply(it).build()
         }
 
         // Path Parameters
         val parameterDescriptors = pathParameterBuilder?.let {
             PathParameterBuilder().apply(it).pathParameterDescriptors
         }
-        println(parameterDescriptors?.size)
-
-        // Response Body
-//        val responseBodyDescriptors = responseBodyBuilder?.let {
-//            ResponseBodyBuilder().apply(it).responseBodyDescriptors
-//        }
-
-//        val fields = ConstrainedFields(::class.java) // TODO : 변경
 
         // Resource
         val resourceBuilder = ResourceSnippetParameters.builder()
@@ -81,12 +85,22 @@ class CustomRestDocsBuilder(
 
         // Snippets
         val snippets = mutableListOf<Snippet>()
-        parameterDescriptors?.let {
-            snippets.add(org.springframework.restdocs.request.RequestDocumentation.pathParameters(it))
-        }
         queryParameterDescriptors?.let {
-            snippets.add(org.springframework.restdocs.request.RequestDocumentation.queryParameters(it))
+            resourceBuilder.queryParameters(*it.toTypedArray())
         }
+        parameterDescriptors?.let {
+            resourceBuilder.pathParameters(*it.toTypedArray())
+        }
+
+        // RequestPartBody
+        requestPartBodySnippets?.let { requestPartBodySnippets ->
+            requestPartBodySnippets.forEach {
+                snippets.add(
+                    it
+                )
+            }
+        }
+
         snippets.add(
             resource(
                 resourceBuilder.build()
@@ -111,10 +125,19 @@ class CustomRestDocsBuilder(
         this.requestBuilder = RequestBuilder(method, url).apply(requestBuilder).build()
     }
 
+    fun multipartRequestLine(
+        method: HttpMethod,
+        url: String,
+        requestBuilder: MultipartRequestBuilder.() -> Unit
+    ) {
+        this.mockMultipartRequestBuilder = MultipartRequestBuilder(method, url).apply(requestBuilder).build()
+    }
 
     fun assertBuilder(
+        status: ResultMatcher = MockMvcResultMatchers.status().isOk,
         assertBuilder: (AssertBuilder.() -> Unit)? = null
     ) {
+        this.status = status
         this.assertBuilder = assertBuilder
     }
 
@@ -144,6 +167,13 @@ class CustomRestDocsBuilder(
         val test = RequestBodyBuilder().apply(requestBodyBuilder)
         this.requestBodyDescriptors = test.requestBodyDescriptors
     }
+
+    fun requestPartBody(
+        requestPartBodyBuilder: RequestPartBodyBuilder.() -> Unit
+    ) {
+        val test = RequestPartBodyBuilder().apply(requestPartBodyBuilder)
+        this.requestPartBodySnippets = test.requestPartBodySnippets
+    }
 }
 
 class RequestBuilder(
@@ -154,7 +184,6 @@ class RequestBuilder(
     private var contentType: MediaType = MediaType.APPLICATION_JSON
     private val params: MultiValueMap<String, String> = LinkedMultiValueMap()
     private var content: String? = null
-    private val files: MutableList<MockMultipartFile> = mutableListOf()
 
     fun build(): MockHttpServletRequestBuilder {
         val requestBuilder = when (method) {
@@ -173,10 +202,6 @@ class RequestBuilder(
         content?.let {
             requestBuilder.content(it)
         }
-
-//        files.forEach {
-//            requestBuilder.file(it)
-//        }
 
         return requestBuilder
     }
@@ -198,6 +223,28 @@ class RequestBuilder(
     fun content(content: String) {
         this.content = content
     }
+}
+
+class MultipartRequestBuilder(
+    private val method: HttpMethod,
+    private val url: String
+) {
+    private var uriVariables: Array<out Any> = emptyArray()
+    private var contentType: MediaType = MediaType.MULTIPART_FORM_DATA
+    private val files: MutableList<MockMultipartFile> = mutableListOf()
+
+
+    fun build(): MockMultipartHttpServletRequestBuilder {
+        val multipartRequestBuilder = MockMvcRequestBuilders.multipart(method, url, *uriVariables)
+        multipartRequestBuilder.contentType(contentType)
+
+        files.forEach {
+            println(it)
+            multipartRequestBuilder.file(it)
+        }
+
+        return multipartRequestBuilder
+    }
 
     fun file(file: MockMultipartFile) {
         files.add(file)
@@ -205,12 +252,24 @@ class RequestBuilder(
 }
 
 class AssertBuilder(
-    private val resultActions: ResultActions
+    private val status: ResultMatcher = MockMvcResultMatchers.status().isOk,
+    private var resultActions: ResultActions
 ) {
-    var status: ResultMatcher = MockMvcResultMatchers.status().isOk
+    //    private var status: ResultMatcher = MockMvcResultMatchers.status().isOk
+    private val resultMatchers: MutableList<ResultMatcher> = mutableListOf()
 
     fun build() {
-        resultActions.andExpect(status)
+        resultActions = resultActions.andExpect(status)
+        resultMatchers.forEach {
+            resultActions = resultActions.andExpect(it)
+        }
+    }
+
+    fun assert(
+        path: String,
+        value: Any?
+    ) {
+        resultMatchers.add(jsonPath(path).value(value))
     }
 }
 
@@ -260,6 +319,18 @@ class RequestBodyBuilder {
     ) {
         requestBodyDescriptors.add(
             fieldWithPath(name).description(description)
+        )
+    }
+}
+
+class RequestPartBodyBuilder {
+    val requestPartBodySnippets = mutableListOf<RequestPartBodySnippet>()
+
+    fun field(
+        name: String
+    ) {
+        requestPartBodySnippets.add(
+            requestPartBody(name)
         )
     }
 }
