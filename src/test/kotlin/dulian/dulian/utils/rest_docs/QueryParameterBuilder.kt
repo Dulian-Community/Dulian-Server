@@ -14,10 +14,13 @@ class QueryParameterBuilder {
      */
     fun param(
         name: String,
-        description: String
+        description: String,
+        optional: Boolean? = false
     ) {
-        queryParameterDescriptors.add(
-            parameterWithName(name).description(description)
-        )
+        val parameterDescriptor = parameterWithName(name).description(description)
+        if (optional == true) {
+            parameterDescriptor.optional()
+        }
+        queryParameterDescriptors.add(parameterDescriptor)
     }
 }

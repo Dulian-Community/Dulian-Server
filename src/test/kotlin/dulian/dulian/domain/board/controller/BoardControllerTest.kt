@@ -398,13 +398,13 @@ class BoardControllerTest(
                         }
                     }
                     queryParameters {
-                        param("page", "페이지 번호")
-                        param("query", "검색어")
-                        param("condition", "검색 조건(ALL, TITLE, CONTENT, NICKNAME)")
-                        param("order", "정렬 조건(LATEST, POPULAR, COMMENT, VIEW)")
-                        param("startDate", "시작 날짜(YYYY-MM-DD)")
-                        param("endDate", "종료 날짜(YYYY-MM-DD)")
-                        param("isMarked", "북마크 여부(Y, N)")
+                        param("page", "페이지 번호", true)
+                        param("query", "검색어", true)
+                        param("condition", "검색 조건(ALL, TITLE, CONTENT, NICKNAME)", true)
+                        param("order", "정렬 조건(LATEST, POPULAR, COMMENT, VIEW)", true)
+                        param("startDate", "시작 날짜(YYYY-MM-DD)", true)
+                        param("endDate", "종료 날짜(YYYY-MM-DD)", true)
+                        param("isMarked", "북마크 여부(Y, N)", true)
                     }
 
                     responseBody {
