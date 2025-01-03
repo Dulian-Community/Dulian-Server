@@ -1,13 +1,13 @@
 package dulian.dulian.utils
 
-import org.springframework.http.MediaType
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+import dulian.dulian.utils.rest_docs.CustomRestDocsBuilder
+import org.springframework.test.web.servlet.MockMvc
 
-fun MockMvcRequestBuilders.post(
-    url: String,
-    content: String
+fun MockMvc.makeDocument(
+    identifier: String,
+    tag: String,
+    summary: String,
+    customRestDocsBuilder: CustomRestDocsBuilder.() -> Unit
 ) {
-    MockMvcRequestBuilders.post(url)
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(content)
+    CustomRestDocsBuilder(this, identifier, tag, summary).apply(customRestDocsBuilder).build()
 }
