@@ -191,7 +191,12 @@ swaggerSources {
 
 // OpenAPI 3.0 설정
 configure<OpenApi3Extension> {
-    setServer("http://localhost:8080")
+    val url = when (activeProfile) {
+        "local" -> "http://localhost:8080"
+        "dev" -> "http://dev-api.dulian.kr"
+        else -> "http://api.dulian.kr"
+    }
+    setServer(url)
     title = "Dulian API"
     description = "Dulian API"
     version = "1.0.0"
