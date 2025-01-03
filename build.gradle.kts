@@ -220,6 +220,27 @@ tasks.register<Copy>("copySwaggerUI") {
 
     // 대상 디렉토리 설정
     into(layout.buildDirectory.dir("resources/main/static/docs").get().asFile)
+
+    doFirst {
+        // RequestPart는 지원하지 않아 하드코딩
+        val originalFile = layout.buildDirectory.dir("api-spec/openapi3.yaml").get().asFile
+        originalFile.writeText(
+            originalFile.readText()
+                .replace(
+                    "operationId: '이미지 업로드 '",
+                    "operationId: '이미지 업로드 '\n" +
+                            "      requestBody:\n" +
+                            "        content:\n" +
+                            "          multipart/form-data: \n" +
+                            "            schema: \n" +
+                            "              type: object\n" +
+                            "              properties: \n" +
+                            "                image: \n" +
+                            "                  type: string\n" +
+                            "                  format: binary"
+                )
+        )
+    }
 }
 
 // BootJar 작업에 Swagger UI 복사 작업 추가
