@@ -226,20 +226,11 @@ tasks.register<Copy>("copySwaggerUI") {
         val originalFile = layout.buildDirectory.dir("api-spec/openapi3.yaml").get().asFile
         originalFile.writeText(
             originalFile.readText()
-                .replace(
-                    "operationId: '이미지 업로드 '",
-                    "operationId: '이미지 업로드 '\n" +
-                            "      requestBody:\n" +
-                            "        content:\n" +
-                            "          multipart/form-data: \n" +
-                            "            schema: \n" +
-                            "              type: object\n" +
-                            "              properties: \n" +
-                            "                image: \n" +
-                            "                  type: string\n" +
-                            "                  format: binary"
-                )
+                .replace(SwaggerUI.IMAGE_UPLOAD_BEFORE_TEXT, SwaggerUI.IMAGE_UPLOAD_AFTER_TEXT)
         )
+
+        // Security 설정 추가
+        originalFile.appendText(SwaggerUI.SECURITY_SCHEMES_CONTENT)
     }
 }
 
@@ -251,4 +242,25 @@ tasks.named<BootJar>("bootJar") {
 // ResolveMainClassName 작업에 Swagger UI 복사 작업 추가
 tasks.named<ResolveMainClassName>("resolveMainClassName") {
     dependsOn("copySwaggerUI")
+}
+
+object SwaggerUI {
+    const val SECURITY_SCHEMES_CONTENT = "  securitySchemes:\n" +
+            "    APIKey:\n" +
+            "      type: apiKey\n" +
+            "      name: Authorization\n" +
+            "      in: header\n" +
+            "security:\n" +
+            "  - APIKey: []  #  Apply the security scheme here"
+    const val IMAGE_UPLOAD_BEFORE_TEXT = "operationId: '이미지 업로드 '"
+    const val IMAGE_UPLOAD_AFTER_TEXT = "operationId: '이미지 업로드 '\n" +
+            "      requestBody:\n" +
+            "        content:\n" +
+            "          multipart/form-data: \n" +
+            "            schema: \n" +
+            "              type: object\n" +
+            "              properties: \n" +
+            "                image: \n" +
+            "                  type: string\n" +
+            "                  format: binary"
 }
