@@ -232,19 +232,21 @@ class AuthControllerTest(
                         requestBody(objectMapper.writeValueAsString(request))
                     }
                     assertBuilder {
-                        assert("data.token", token.token)
-                        assert("data.expiresIn", token.expiresIn)
+                        prefix("data") {
+                            assert("token", token.token)
+                            assert("expiresIn", token.expiresIn)
+                        }
                     }
                     requestBody {
                         field("userId", "아이디")
                         field("password", "비밀번호")
                     }
                     responseBody {
-                        field("data.token", "Access Token")
-                        field("data.expiresIn", "Access Token 만료 시간")
-                        field("status", "상태")
-                        field("statusCode", "상태 코드")
-                        field("timestamp", "응답 시간")
+                        prefix("data") {
+                            field("token", "Access Token")
+                            field("expiresIn", "Access Token 만료 시간")
+                        }
+                        commonField()
                     }
                 }
 
@@ -276,15 +278,17 @@ class AuthControllerTest(
                 mockMvc.makeDocument("Access Token 갱신 성공", "Auth", "Access Token 갱신 API") {
                     requestLine(HttpMethod.POST, "/api/v1/auth/refresh") {}
                     assertBuilder {
-                        assert("data.token", token.token)
-                        assert("data.expiresIn", token.expiresIn)
+                        prefix("data") {
+                            assert("token", token.token)
+                            assert("expiresIn", token.expiresIn)
+                        }
                     }
                     responseBody {
-                        field("data.token", "Access Token")
-                        field("data.expiresIn", "Access Token 만료 시간")
-                        field("status", "상태")
-                        field("statusCode", "상태 코드")
-                        field("timestamp", "응답 시간")
+                        prefix("data") {
+                            field("token", "Access Token")
+                            field("expiresIn", "Access Token 만료 시간")
+                        }
+                        commonField()
                     }
                 }
             }

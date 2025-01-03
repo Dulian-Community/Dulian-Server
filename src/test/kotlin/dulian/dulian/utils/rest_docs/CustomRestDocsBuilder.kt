@@ -3,7 +3,6 @@ package dulian.dulian.utils.rest_docs
 import com.epages.restdocs.apispec.ResourceDocumentation.resource
 import com.epages.restdocs.apispec.ResourceSnippetParameters
 import com.epages.restdocs.apispec.ResourceSnippetParametersBuilder
-import dulian.dulian.utils.*
 import org.springframework.http.HttpMethod
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document
 import org.springframework.restdocs.operation.preprocess.Preprocessors
@@ -123,8 +122,7 @@ class CustomRestDocsBuilder(
     fun responseBody(
         responseBodyBuilder: ResponseBodyBuilder.() -> Unit
     ) {
-        val test = ResponseBodyBuilder().apply(responseBodyBuilder)
-        this.responseBodyDescriptors = test.responseBodyDescriptors
+        this.responseBodyDescriptors = ResponseBodyBuilder().apply(responseBodyBuilder).responseBodyDescriptors
     }
 
     /**
@@ -135,8 +133,7 @@ class CustomRestDocsBuilder(
     fun queryParameters(
         queryParameterBuilder: QueryParameterBuilder.() -> Unit
     ) {
-        val test = QueryParameterBuilder().apply(queryParameterBuilder)
-        this.queryParameterDescriptors = test.queryParameters
+        this.queryParameterDescriptors = QueryParameterBuilder().apply(queryParameterBuilder).queryParameterDescriptors
     }
 
     /**
@@ -147,8 +144,7 @@ class CustomRestDocsBuilder(
     fun requestBody(
         requestBodyBuilder: RequestBodyBuilder.() -> Unit
     ) {
-        val test = RequestBodyBuilder().apply(requestBodyBuilder)
-        this.requestBodyDescriptors = test.requestBodyDescriptors
+        this.requestBodyDescriptors = RequestBodyBuilder().apply(requestBodyBuilder).requestBodyDescriptors
     }
 
     /**
@@ -159,8 +155,7 @@ class CustomRestDocsBuilder(
     fun requestPartBody(
         requestPartBodyBuilder: RequestPartBodyBuilder.() -> Unit
     ) {
-        val test = RequestPartBodyBuilder().apply(requestPartBodyBuilder)
-        this.requestPartBodySnippets = test.requestPartBodySnippets
+        this.requestPartBodySnippets = RequestPartBodyBuilder().apply(requestPartBodyBuilder).requestPartBodySnippets
     }
 
     /**
@@ -190,6 +185,7 @@ class CustomRestDocsBuilder(
 
         // Response Body
         responseBodyDescriptors?.let {
+            it.forEach { itt -> println(itt.path) }
             resourceBuilder.responseFields(it)
         }
 

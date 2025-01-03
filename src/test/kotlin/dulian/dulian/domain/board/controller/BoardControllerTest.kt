@@ -140,18 +140,20 @@ class BoardControllerTest(
                         file(file)
                     }
                     assertBuilder {
-                        assert("data.atchFileDetailId", s3FileDto.atchFileDetailId)
-                        assert("data.atchFileUrl", s3FileDto.atchFileUrl)
+                        prefix("data") {
+                            assert("atchFileDetailId", s3FileDto.atchFileDetailId)
+                            assert("atchFileUrl", s3FileDto.atchFileUrl)
+                        }
                     }
                     requestPartBody {
                         field("image")
                     }
                     responseBody {
-                        field("data.atchFileDetailId", "첨부파일 상세 ID")
-                        field("data.atchFileUrl", "첨부파일 URL")
-                        field("status", "상태")
-                        field("statusCode", "상태 코드")
-                        field("timestamp", "응답 시간")
+                        prefix("data") {
+                            field("atchFileDetailId", "첨부파일 상세 ID")
+                            field("atchFileUrl", "첨부파일 URL")
+                        }
+                        commonField()
                     }
                 }
             }
@@ -177,38 +179,40 @@ class BoardControllerTest(
                         field("boardId", "게시물 ID")
                     }
                     assertBuilder {
-                        assert("data.boardId", board.boardId)
-                        assert("data.title", board.title)
-                        assert("data.content", board.content)
-                        assert("data.nickname", board.nickname)
-                        assert("data.viewCount", board.viewCount)
-                        assert("data.likeCount", board.likeCount)
-                        assert("data.isLiked", board.isLiked.toString())
-                        assert("data.isMarked", board.isMarked.toString())
-                        assert("data.isMine", board.isMine.toString())
-                        assert("data.images[0].imageId", board.images?.get(0)?.imageId)
-                        assert("data.images[0].imageUrl", board.images?.get(0)?.imageUrl)
-                        assert("data.tags[0].tagId", board.tags?.get(0)?.tagId)
-                        assert("data.tags[0].name", board.tags?.get(0)?.name)
+                        prefix("data") {
+                            assert("boardId", board.boardId)
+                            assert("title", board.title)
+                            assert("content", board.content)
+                            assert("nickname", board.nickname)
+                            assert("viewCount", board.viewCount)
+                            assert("likeCount", board.likeCount)
+                            assert("isLiked", board.isLiked.toString())
+                            assert("isMarked", board.isMarked.toString())
+                            assert("isMine", board.isMine.toString())
+                            assert("images[0].imageId", board.images?.get(0)?.imageId)
+                            assert("images[0].imageUrl", board.images?.get(0)?.imageUrl)
+                            assert("tags[0].tagId", board.tags?.get(0)?.tagId)
+                            assert("tags[0].name", board.tags?.get(0)?.name)
+                        }
                     }
                     responseBody {
-                        field("data.boardId", "게시물 ID")
-                        field("data.title", "제목")
-                        field("data.content", "내용")
-                        field("data.nickname", "닉네임")
-                        field("data.viewCount", "조회수")
-                        field("data.likeCount", "좋아요 수")
-                        field("data.isLiked", "좋아요 여부")
-                        field("data.isMarked", "북마크 여부")
-                        field("data.isMine", "본인 게시물 여부")
-                        field("data.createdAt", "작성일")
-                        field("data.images[0].imageId", "이미지 ID")
-                        field("data.images[0].imageUrl", "이미지 URL")
-                        field("data.tags[0].tagId", "태그 ID")
-                        field("data.tags[0].name", "태그 이름")
-                        field("status", "상태")
-                        field("statusCode", "상태 코드")
-                        field("timestamp", "응답 시간")
+                        prefix("data") {
+                            field("boardId", "게시물 ID")
+                            field("title", "제목")
+                            field("content", "내용")
+                            field("nickname", "닉네임")
+                            field("viewCount", "조회수")
+                            field("likeCount", "좋아요 수")
+                            field("isLiked", "좋아요 여부")
+                            field("isMarked", "북마크 여부")
+                            field("isMine", "본인 게시물 여부")
+                            field("createdAt", "작성일")
+                            field("images[0].imageId", "이미지 ID")
+                            field("images[0].imageUrl", "이미지 URL")
+                            field("tags[0].tagId", "태그 ID")
+                            field("tags[0].name", "태그 이름")
+                        }
+                        commonField()
                     }
                 }
             }
@@ -376,18 +380,22 @@ class BoardControllerTest(
                         param("isMarked", "Y")
                     }
                     assertBuilder {
-                        assert("data.result[0].boardId", response.boardId)
-                        assert("data.result[0].nickname", response.nickname)
-                        assert("data.result[0].title", response.title)
-                        assert("data.result[0].content", response.content)
-                        assert("data.result[0].viewCount", response.viewCount)
-                        assert("data.result[0].isMarked", response.isMarked.toString())
-                        assert("data.result[0].likeCount", response.likeCount)
-                        assert("data.result[0].tags[0]", response.tags[0])
-                        assert("data.totalElements", pageResponse.totalElements)
-                        assert("data.totalPages", pageResponse.totalPages)
-                        assert("data.currentPage", pageResponse.currentPage)
-                        assert("data.pageSize", pageResponse.pageSize)
+                        prefix("data") {
+                            prefix("result[0]") {
+                                assert("boardId", response.boardId)
+                                assert("nickname", response.nickname)
+                                assert("title", response.title)
+                                assert("content", response.content)
+                                assert("viewCount", response.viewCount)
+                                assert("isMarked", response.isMarked.toString())
+                                assert("likeCount", response.likeCount)
+                                assert("tags[0]", response.tags[0])
+                            }
+                            assert("totalElements", pageResponse.totalElements)
+                            assert("totalPages", pageResponse.totalPages)
+                            assert("currentPage", pageResponse.currentPage)
+                            assert("pageSize", pageResponse.pageSize)
+                        }
                     }
                     queryParameters {
                         param("page", "페이지 번호")
@@ -400,22 +408,24 @@ class BoardControllerTest(
                     }
 
                     responseBody {
-                        field("data.result[0].boardId", "게시물 ID")
-                        field("data.result[0].nickname", "닉네임")
-                        field("data.result[0].title", "제목")
-                        field("data.result[0].content", "내용")
-                        field("data.result[0].viewCount", "조회수")
-                        field("data.result[0].createdAt", "작성일")
-                        field("data.result[0].isMarked", "북마크 여부")
-                        field("data.result[0].likeCount", "좋아요 수")
-                        field("data.result[0].tags[0]", "태그")
-                        field("data.totalElements", "총 게시물 수")
-                        field("data.totalPages", "총 페이지 수")
-                        field("data.currentPage", "현재 페이지")
-                        field("data.pageSize", "페이지 크기")
-                        field("status", "상태")
-                        field("statusCode", "상태 코드")
-                        field("timestamp", "응답 시간")
+                        prefix("data") {
+                            prefix("result[0]") {
+                                field("boardId", "게시물 ID")
+                                field("nickname", "닉네임")
+                                field("title", "제목")
+                                field("content", "내용")
+                                field("viewCount", "조회수")
+                                field("isMarked", "북마크 여부")
+                                field("likeCount", "좋아요 수")
+                                field("createdAt", "작성일")
+                                field("tags[0]", "태그")
+                            }
+                            field("totalElements", "총 게시물 수")
+                            field("totalPages", "총 페이지 수")
+                            field("currentPage", "현재 페이지")
+                            field("pageSize", "페이지 크기")
+                        }
+                        commonField()
                     }
                 }
             }

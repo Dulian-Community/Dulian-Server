@@ -4,7 +4,7 @@ import org.springframework.restdocs.request.ParameterDescriptor
 import org.springframework.restdocs.request.RequestDocumentation.parameterWithName
 
 class QueryParameterBuilder {
-    val queryParameters = mutableListOf<ParameterDescriptor>()
+    val queryParameterDescriptors = mutableListOf<ParameterDescriptor>()
 
     /**
      * Add query parameter to the request
@@ -16,7 +16,7 @@ class QueryParameterBuilder {
         name: String,
         description: String
     ) {
-        queryParameters.add(
+        queryParameterDescriptors.add(
             parameterWithName(name).description(description)
         )
     }
