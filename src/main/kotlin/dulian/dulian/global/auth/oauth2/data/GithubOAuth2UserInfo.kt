@@ -1,11 +1,10 @@
 package dulian.dulian.global.auth.oauth2.data
 
-class NaverOAuth2UserInfo(
+class GithubOAuth2UserInfo(
     attributes: Map<String, Any>
 ) : OAuth2UserInfo(attributes) {
 
     override fun getId(): String {
-        val response = attributes["response"] as Map<*, *>
-        return response["id"] as String
+        return attributes["id"].toString()
     }
 }
