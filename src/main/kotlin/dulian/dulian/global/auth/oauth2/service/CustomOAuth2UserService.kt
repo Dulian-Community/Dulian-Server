@@ -2,9 +2,10 @@ package dulian.dulian.global.auth.oauth2.service
 
 import dulian.dulian.domain.auth.entity.Member
 import dulian.dulian.domain.auth.repository.MemberRepository
-import dulian.dulian.global.auth.enums.SocialType
 import dulian.dulian.global.auth.oauth2.data.CustomOAuth2User
-import dulian.dulian.global.auth.oauth2.factory.OAuth2UserInfoFactory
+import dulian.dulian.global.exception.CommonErrorCode
+import dulian.dulian.global.exception.CustomException
+import io.github.oshai.kotlinlogging.KotlinLogging
 import jakarta.transaction.Transactional
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest
@@ -16,6 +17,8 @@ import org.springframework.stereotype.Service
 class CustomOAuth2UserService(
     private val memberRepository: MemberRepository
 ) : OAuth2UserService<OAuth2UserRequest, OAuth2User> {
+
+    private val log = KotlinLogging.logger {}
 
     @Transactional
     override fun loadUser(userRequest: OAuth2UserRequest?): OAuth2User {
@@ -29,31 +32,44 @@ class CustomOAuth2UserService(
             ?.userNameAttributeName
         val attributes = oAuth2User.attributes
 
-        // 소셜 로그인 타입 구분
-        val socialType = SocialType.valueOf(registrationId?.uppercase()!!)
+        // Github 로그인만 허용
+        if (registrationId?.uppercase() != "GITHUB") {
+            log.error { "$registrationId 로 로그인 시도" }
+            throw CustomException(CommonErrorCode.UNAUTHORIZED)
+        }
 
-        val oAuth2UserInfo = OAuth2UserInfoFactory.of(socialType, attributes)
+        // Github Access Token 파싱
+        val githubAccessToken = userRequest.accessToken?.tokenValue
+            ?: throw CustomException(CommonErrorCode.UNAUTHORIZED)
+
+        // Github ID 파싱
+        val githubId = attributes["login"].toString()
+
+        // Github Unique ID 파싱
+        val githubUniqueId = attributes["id"].toString()
+
+        // Email 파싱
+        val email = attributes["email"].toString()
 
         // 이미 가입된 회원인지 확인 후 가입되지 않은 회원이면 저장
-        val savedMember = memberRepository.findByUserIdAndSocialType(oAuth2UserInfo.getId(), socialType)
+        val savedMember = memberRepository.findByUserId(githubUniqueId)
         val memberId = if (savedMember == null) {
-            memberRepository.save(Member.ofOAuth2(oAuth2UserInfo, socialType)).memberId!!
+            memberRepository.save(
+                Member.ofOAuth2(
+                    githubUniqueId,
+                    githubId,
+                    email,
+                    githubAccessToken
+                )
+            ).memberId!!
         } else {
+            savedMember.updateGithubAccessToken(githubAccessToken)
             savedMember.memberId!!
         }
 
         return CustomOAuth2User(
-            attributes = if (socialType == SocialType.NAVER) {
-                @Suppress("UNCHECKED_CAST")
-                oAuth2User.attributes["response"] as Map<String, Any>
-            } else {
-                oAuth2User.attributes
-            },
-            nameAttributeKey = if (socialType == SocialType.NAVER) {
-                "id"
-            } else {
-                usernameAttributeName!!
-            },
+            attributes = attributes,
+            nameAttributeKey = usernameAttributeName!!,
             userId = memberId.toString()
         )
     }
