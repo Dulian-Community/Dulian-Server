@@ -43,6 +43,9 @@ spring:
                         client-id: ENC(zvcclKqQ+uNLDzapr0lI2eXp7b3xUo8piBFQN2fJHMA=)
                         client-secret: ENC(TNwydrQHdXVm9mhNug80fctU27LAnAtLm7U3MFbROvW17RVkzw9pps71QgM25u4WX6gmO5knxGo=)
                         redirect-uri: ENC(hrynHar952Bvb4O1t/GFSjtEceQUZ2qFuPme2SY2RCNSAEBjQOe5oHR+XluKkE/1asP2Exs/DIs=)
+                        scope:
+                            - repo
+                            - user
                 provider:
                     kakao:
                         authorization-uri: https://kauth.kakao.com/oauth/authorize
