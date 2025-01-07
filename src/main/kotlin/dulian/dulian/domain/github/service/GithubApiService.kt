@@ -1,6 +1,8 @@
 package dulian.dulian.domain.github.service
 
 import dulian.dulian.domain.auth.repository.MemberRepository
+import dulian.dulian.domain.github.dto.BranchListApiResponse
+import dulian.dulian.domain.github.dto.BranchListDto
 import dulian.dulian.domain.github.dto.RepositoryListApiResponse
 import dulian.dulian.domain.github.dto.RepositoryListDto
 import dulian.dulian.global.exception.CommonErrorCode
@@ -28,16 +30,25 @@ class GithubApiService(
     private val log = KotlinLogging.logger { }
 
     @Transactional(readOnly = true)
-    fun getRepositoryList(): List<RepositoryListDto.Response> {
+    fun getRepositoryList(): RepositoryListDto.Response {
         val member = memberRepository.findByIdOrNull(SecurityUtils.getCurrentUserId())
             ?: throw CustomException(CommonErrorCode.UNAUTHORIZED)
 
         // TODO : 추후 Member-GithubAccessToken NotNull로 변경
-        return fetchRepositoryList(member.githubAccessToken!!)
-            .groupBy { it.repositoryName.split("/").first() }
-            .map { (parentName, repositories) ->
-                RepositoryListDto.Response.of(parentName, repositories)
-            }
+        val apiResult = fetchRepositoryList(member.githubAccessToken!!)
+        return RepositoryListDto.Response.of(apiResult)
+    }
+
+    @Transactional(readOnly = true)
+    fun getBranchList(
+        owner: String,
+        repo: String
+    ): BranchListDto.Response {
+        val member = memberRepository.findByIdOrNull(SecurityUtils.getCurrentUserId())
+            ?: throw CustomException(CommonErrorCode.UNAUTHORIZED)
+
+        val apiResult = fetchBranchList(member.githubAccessToken!!, owner, repo)
+        return BranchListDto.Response.of(apiResult)
     }
 
     fun fetchRepositoryList(
@@ -88,6 +99,45 @@ class GithubApiService(
                 visibility = visibility,
                 avatarUrl = avatarUrl
             )
+        }
+    }
+
+    fun fetchBranchList(
+        token: String,
+        owner: String,
+        repo: String
+    ): List<BranchListApiResponse> {
+        val url = "https://api.github.com/repos/$owner/$repo/branches"
+
+        // 헤더 설정
+        val headers = HttpHeaders()
+        headers["Authorization"] = "Bearer $token"
+        headers["X-Github-Api-Version"] = "2022-11-28"
+        headers["Accept"] = "application/vnd.github+json"
+
+        // HttpEntity에 헤더 추가
+        val entity = HttpEntity<String>(headers)
+
+        val uri = UriComponentsBuilder.fromUriString(url)
+            .queryParam("per_page", "100")
+            .build()
+            .toUri()
+
+        // GET 요청을 보내고 응답을 ResponseEntity로 받음
+        val response: ResponseEntity<String> =
+            restTemplate.exchange(uri, HttpMethod.GET, entity, String::class.java)
+
+        if (!response.statusCode.is2xxSuccessful) {
+            log.error { "[$uri][token : $token] - API 호출 실패" }
+            throw CustomException(CommonErrorCode.INTERNAL_SERVER_ERROR)
+        }
+
+        val parser = JSONParser()
+        val jsonArray = parser.parse(response.body) as JSONArray
+        return jsonArray.map {
+            val data = it as JSONObject
+
+            BranchListApiResponse.of(data["name"].toString())
         }
     }
 }
