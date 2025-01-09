@@ -1,29 +1,29 @@
 package dulian.dulian.domain.github.dto
 
-class BranchListDto {
+class CommitListDto {
     data class Response(
-        val result: List<Branch>,
+        val result: List<Commit>,
         val totalElements: Int
     ) {
         companion object {
             fun of(
-                responses: List<BranchListApiResponse>
+                responses: List<CommitListApiResponse>
             ) = Response(
                 result = responses.map {
-                    Branch.of(it)
+                    Commit.of(it)
                 },
                 totalElements = responses.size
             )
         }
 
-        data class Branch(
-            val branch: String
+        data class Commit(
+            val message: String
         ) {
             companion object {
                 fun of(
-                    response: BranchListApiResponse
-                ) = Branch(
-                    branch = response.name
+                    response: CommitListApiResponse
+                ) = Commit(
+                    message = response.message
                 )
             }
         }
