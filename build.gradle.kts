@@ -125,6 +125,12 @@ dependencies {
     // AWS
     implementation("org.springframework.cloud:spring-cloud-starter-aws:${Versions.AMAZON_VERSION}")
 
+    // Rest Template
+    implementation("org.apache.httpcomponents.client5:httpclient5")
+
+    // JSON
+    implementation("com.googlecode.json-simple:json-simple:1.1.1")
+
     // Test
     implementation("io.kotest.extensions:kotest-extensions-spring:${Versions.KOTEST_EXTENSIONS_SPRING_VERSION}")
     testImplementation("org.springframework.boot:spring-boot-starter-test")

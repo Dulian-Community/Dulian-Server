@@ -67,9 +67,13 @@ class CustomOAuth2UserService(
             savedMember.memberId!!
         }
 
+        // MemberId를 인증 객체에 넣기 위한 변환 작업
+        val mutableAttributes = attributes.toMutableMap()
+        mutableAttributes[usernameAttributeName!!] = memberId.toString()
+
         return CustomOAuth2User(
-            attributes = attributes,
-            nameAttributeKey = usernameAttributeName!!,
+            attributes = mutableAttributes,
+            nameAttributeKey = usernameAttributeName,
             userId = memberId.toString()
         )
     }
