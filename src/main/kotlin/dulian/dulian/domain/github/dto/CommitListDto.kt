@@ -17,13 +17,15 @@ class CommitListDto {
         }
 
         data class Commit(
-            val message: String
+            val message: String,
+            val sha: String
         ) {
             companion object {
                 fun of(
                     response: CommitListApiResponse
                 ) = Commit(
-                    message = response.message
+                    message = response.message,
+                    sha = response.sha
                 )
             }
         }

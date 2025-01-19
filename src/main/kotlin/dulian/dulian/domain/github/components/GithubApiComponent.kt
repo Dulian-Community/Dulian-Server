@@ -91,7 +91,12 @@ class GithubApiComponent(
             val data = it as JSONObject
 
             val commit = data["commit"] as JSONObject
-            CommitListApiResponse.of(commit["message"].toString())
+            val tree = commit["tree"] as JSONObject
+
+            CommitListApiResponse.of(
+                message = commit["message"].toString(),
+                sha = tree["sha"].toString()
+            )
         }
     }
 }
